@@ -7,158 +7,315 @@
 %%==================================================
 
 %\bibliographystyle{sjtu2}%[此处用于每章都生产参考文献]
-\chapter{这是什么}
+\chapter{绪论}
 \label{chap:intro}
+\section{研究背景与意义}
+本论文由上海市发展和改革委员战略新兴产业专项项目“基于物联网的当代艺术品电子商务公
+共服务平台”、上海市经济和信息化委员会、上海市人力资源和社会保障局项目“上海市物联网技术
+高技能人才培养基地RFID 应用实训设施设备环境资助”两个课题支撑。
 
-这是上海交通大学(非官方)学位论文 \LaTeX 模板，当前版本是 \version 。
+\begin{figure}[!htp]
+  \centering
+  \includegraphics[width=0.7\textwidth]{figure/identification-method.pdf}
+  \bicaption
+    {身份认证方式}
+    {Identification methods}
+  \label{fig:identification-method}
+\end{figure}
+随着信息技术的兴起和广泛应用，许多应用需要用户首先进行登录操作，这其实就是身份识别方式，只有通过了通过身份认证的用户才会被系统认为是授权用户，用户才能访问到自己的隐私数据，比如地址信息、财务信息等。如图~\ref{fig:identification-method}所示，用户的身份方式可以为分为三种~\cite{Huang2011A}：
+\begin{enumerate}[label=(\arabic*)]
+    \item \textbf{根据用户知道的信息来证明身份。（你知道什么？）}日常生活中，我们以前最常用的是密码登录，这是一种依赖用户知道什么来识别是否为授权用户，但用户知道的密码被泄露，恶意用户输入相同的密码也会被系统识别为授权用户。
+    \item \textbf{根据用户拥有的东西来证明身份。（你有什么？）}我们回家会使用钥匙开门，钥匙就是我们所拥有的东西，比起用户知道的信息，此处则体现为用户拥有的物理实体。
+    \item \textbf{根据用户独一无二的身体特征证明身份。（你是谁？）} 随着智能手机的技术进步和普及，依靠智能手机上丰富的传感器配置，用户的认证方式也变多多样话起来，目前人脸和指纹识别已经被用于手机系统登录和移动支付。人脸~\cite{12717}、指纹~\cite{Andrew2005Handbook}、虹膜~\cite{Wildes1997Iris}等是人体上的固有特征，在随着时间变化上呈稳定状态，这样的认证方式比密码认证更加安全。 除此之外，个人独特的行为特征也可以被用于身份认证，比如：语音识别~\cite{Rashid2008Security}、唇语识别~\cite{Cetingul2006Discriminative}、步态识别~\cite{Boulgouris2005Gait}、手写签名识别~\cite{Plamondona1989Automatic}等。 
+\end{enumerate}
 
-最早的一版学位模板是一位热心的物理系同学制作的。
-那份模板参考了自动化所学位论文模板，使用了CASthesis.cls文档类，中文字符处理则采用当时最为流行的 \CJKLaTeX 方案。
-我根据交大研究生院对学位论文的要求
-\footnote{\url{http://www.gs.sjtu.edu.cn/policy/fileShow.ahtml?id=130}}
-，结合少量个人审美喜好，完成了一份基本可用的交大 \LaTeX 学位论文模板。
-但是，搭建一个 \CJKLaTeX 环境并不简单，单单在Linux下配置环境和添加中文字体，就足够让新手打退堂鼓。
-在William Wang的建议下，我开始着手把模板向 \XeTeX 引擎移植。
-他完成了最初的移植，多亏了他出色的工作，后续的改善工作也得以顺利进行。
+手写签名作为个体的一种重要的行为特征，在金融、法律、政府等领域得到广泛应用，用于用户身份的识别，来识别一份文件的真实性。 相对应得，这种认证方式也会收到恶意用户的攻击，举个例子，攻击者可以仿造存款用户的签名去一张取款支票上签名从而去银行取款，会造成实际用户的财产损失，降低银行存款安全性，大则可引发金融灾难。 而在政府或军事领域，仿造签名会造成更加难以想象的结果，造成社会不公平和混乱。 因此，在这些签名进行授权的领域，签名的识别变得尤其重要。在很久以前甚至现在，签名的识别靠人工进行，签名验证者用户的历史签名在判断当前的签名是否为真实签名。这种方式，需要耗费昂贵的人力资源，且依赖于签名认证员的个人能力，容易造成错误。
 
-随着我对 \LaTeX 系统认知增加，我又断断续续做了一些完善模板的工作，在原有硕士学位论文模板的基础上完成了交大学士和博士学位论文模板。
+信息技术将签名认证方式进行了自动化，自动签名认证系统得到研究和应用。 自动签名认证系统根据捕捉签名的方式不同，可以被分为两大类：离线签名认证系统和在线签名认证系统。 离线签名认证系统依靠签名图像的静态数据进行签名的比较来识别，而在线签名认证系统则依靠用户书写过程中记录下的时间序列数据（如书写速度、笔的压力等）来进行比较和识别。由于，外加的时间维度信息，通常在线签名认证系统的表现由于离线签名认证系统。
 
-现在，交大学位论文模板SJTUTHesis代码在github
-\footnote{\url{https://github.com/sjtug/SJTUThesis}}
-上维护。
-你可以\href{https://github.com/sjtug/SJTUThesis/issues}{在github上开issue}
-、或者在\href{https://bbs.sjtu.edu.cn/bbsdoc?board=TeX_LaTeX}{水源LaTeX版}发帖来反映遇到的问题。
+\begin{figure}[!htp]address
+  \centering
+  \includegraphics[width=0.7\textwidth]{figure/verification-work-flow.pdf}
+  \bicaption
+    {签名认证过程}
+    {Signature verification architecture}
+  \label{fig:signature-verification-architecture}
+\end{figure}
 
-\section{使用模板}
+无论是人工的签名识别还是自动签名认证系统，签名的识别的过程都符合图~\ref{fig:signature-verification-architecture}所示的这个签名认证过程。 在注册过程，用户需要收入多个他/她的签名给系统存入数据库作为模板签名；在操作过程，用户签下签名作为查询签名提交给系统，系统将这个查询签名和模板签名进行比较，判断查询签名是否为真实签名。
 
-\subsection{准备工作}
-\label{sec:requirements}
+一个签名认证系统，识别任务的关键问题在于二方面：
+\begin{enumerate*}[label=\itshape\alph*)\upshape]
+    \item 需要能精准跟踪手写签名过程的行为信息。由于手写签名过程，笔记变化多样，而且运动幅度较小，对传感器的敏感度有较高要求。
+    \item 用户体验和判别精度。用户体验体现在设备对用户的影响，比如是否需要特殊设备、是否需要用户佩戴设备等，还体现在模板签名数量。用户体验可能会和判别精度发生冲突，比如减少的模板签名数量会导致判别精度下降，复杂的设备则能更细粒度跟踪签名运动轨迹，有利于判别精度的提升。
+\end{enumerate*}
 
-要使用这个模板撰写学位论文，需要在\emph{TeX系统}、\emph{TeX技能}上有所准备。
+开展自动手写签名认证的研究才能顺应用户对用户体验和财产安全提升上的诉求，将一部分人力资源从签名识别中解放出来，提高签名识别的准确率和稳定性，有利于维护金融和社会稳定。探索签名的捕捉方式，可以降低签名认证的成本，让签名认证系统在用户中快速普及。 目前国内外对手写签名认证的研究有很多基于开放数据集进行研究，存在一些问题，在普适性和用户体验上有待提高，所以本课题具有较好的研究意义和指导价值。
 
-\begin{itemize}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
-	\item {\TeX}系统：所使用的{\TeX}系统要支持 \XeTeX 引擎，且带有ctex 2.x宏包，以2017年或更新版本的\emph{完整}TeXLive、MacTeX发行版为佳。
-	\item TeX技能：尽管提供了对模板的必要说明，但这不是一份“ \LaTeX 入门文档”。在使用前请先通读其他入门文档。
-	\item 针对Windows用户的额外需求：学位论文模本分别使用git和GNUMake进行版本控制和构建，建议从Cygwin\footnote{\url{http://cygwin.com}}安装这两个工具。
-\end{itemize}
+\section{国内外研究的现状}
+如上文所述，手写签名认证研究的关键问题主要在两个方面，一是数据的来源问题，而是手写签名认证的建模问题。下面本节将从这两个方面对现有研究进行介绍。
 
-\subsection{模板选项}
-\label{sec:thesisoption}
+(1) 数据来源问题的研究现状
 
-sjtuthesis提供了一些常用选项，在thesis.tex在导入sjtuthesis模板类时，可以组合使用。
-这些选项包括：
+在数据来源方面，现有的手写签名认证系统的研究主要依赖于惯性传感器、手写平板设备和扫描图像。其中前二者可用于实现在线签名认证系统，而离线签名认证系统则依赖于扫描图像的数据来源。
 
-\begin{itemize}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
-	\item 学位类型：bachelor(学位)、master(硕士)、doctor(博士)，是必选项。
-	\item 中文字体：fandol(Fandol 开源字体)、windows(Windows 系统下的中文字体)、mac(macOS 系统下的华文字体)、ubuntu(Ubuntu 系统下的文泉驿和文鼎字体)、adobe(Adobe 公司的中文字体)、founder(方正公司的中文字体)，默认根据操作系统自动配置。
-	\item 英文模版：使用english选项启用英文模版。
-	\item 盲审选项：使用review选项后，论文作者、学号、导师姓名、致谢、发表论文和参与项目将被隐去。
-\end{itemize}
+基于惯性传感器的方法~\cite{levy2018handwritten,griswold2019wearables,bunke2011online}利用穿戴在手上的惯性传感器 (速度计、陀螺仪等) 跟踪手部运动，提取个人签名时独特手部运动特征。这种方法，要求用户的穿戴的设备会给用户造成额外的困扰，设备穿戴的位置不宜固定，且会对结果造成较大影响。这里的惯性传感器设备包括：定制设备、腕表和装有惯性传感器的笔。
 
-\subsection{编译模板}
-\label{sec:process}
+基于手写平板设备的方法~\cite{fischer2015robust,kholmatov2005identity,sae2013simple}利用手写笔或者手指在平板书写留下的动态轨迹来识别签名。这样的轨迹在静态轨迹基础上，还能获得书写时对平板压力和轨迹变化速度等时间序列，相比单单用静态图像可以大大提高判别精度。但是这样的设备需要一个手写平板，虽然我们可以利用上智能手机代替，但是这种方式限制了字迹不能写在平板上，而不能写在纸上这样我们生活最常见的场景。
 
-模板默认使用GNUMake构建，GNUMake将调用latemk工具自动完成模板多轮编译：
+基于扫描图像的方法~\cite{hafemann2017learning,hafemann2018fixed,ferrer2005offline,kalera2004offline}使用扫描仪扫描并切割出的签名图像，这种直接比较静态图像，与人工判别的方式在数据来源上有相似之处。由于没有写的过程，这种只比较写出结果的方法，无法判断出在字迹上看起来很相似仿造签名，尽管仿造者用较多的时间才仿造出了这个签名。但这种签名认证方式很有通用性和较好的用户体验，不会给用户签名过程造成干扰，用户可以依照平时的签名习惯来签名。
 
-\begin{lstlisting}[basicstyle=\small\ttfamily, caption={编译模板}, numbers=none]
-make clean thesis.pdf
-\end{lstlisting}
+(2) 手写签名认证建模问题的研究现状
 
-若需要生成包含“原创性声明扫描件”的学位论文文档，请将扫描件保存为statement.pdf，然后调用make生成submit.pdf。
+在手写签名认证建模方面，方法有多种多种，首先针对离线和在线签名认证系统需要采取不同的建模方法。在离线签名认证系统中，则能采用图像匹配的方法，比如人工神经网络(Artificial Neural Network, ANN)~\cite{chandra2016offline}、像素匹配 (Pixel Matching Technique, PMT)~\cite{bhattacharya2013offline}等。 在在线签名认证系统中，又可以分为两种：\textit{a)} 基于函数的方法，使用长短时记忆网络 (Long Short-Term Memory, LSTM)~\cite{hochreiter1997long}, 隐马尔科夫模型 (Hidden Markov Model, HMM)~\cite{rabiner1986introduction}, 动态时间规整 (Dynamic Time Warping, DTW)等这些函数型方法直接在时间序列上进行处理并识别；\textit{b)} 基于特征的方法，这种方法首先对时间序列从时域数据转化为频域数据，可以用到的变换方法有离散傅里叶变换 (Discrete Fourier Transform, DFT)、离散余弦变换 (Discrete Cosine Transform, DCT)~\cite{}等，在频域特征上进行特征选择从而实现数据的降维，在利用提取到的特征进行比较或者分类。匹配方法也可以使用DTW或者欧式距离，而分类方法可以使用一些机器学习方法~\cite{周志华2016机器学习}，比如支持向量机 (Support Vector Machine, SVM)、随机森林 (Random Forest)、朴素贝叶斯 (Naive Bayes)等。这些很多方法都是在公开数据集上进行实现和评估的，当有新数据源时，我们需要设计新的合适的模型。而且，由于使用的是公开数据集，这些研究很少评估系统的鲁棒性，比如不同时间段对签名的影响。
 
-\begin{lstlisting}[basicstyle=\small\ttfamily, caption={生成用于提交的学位论文}, numbers=none]
-make clean submit.pdf
-\end{lstlisting}
+\section{本文研究内容与创新点}
+\subsection{研究内容与所做的工作}
+在本文中，我们针对现有存在的主要问题着重研究设计一种非侵入式、鲁棒的、安全的、低延迟的在线手写签名认证方案，主要的研究内容和本文主要所做的工作如下：
 
-编译失败时，可以尝试手动逐次编译，定位故障。
+(1) 手写签名认证数据源的研究
 
-\begin{lstlisting}[basicstyle=\small\ttfamily, caption={手动逐次编译}, numbers=none]
-xelatex -no-pdf thesis
-biber --debug thesis
-xelatex thesis
-xelatex thesis
-\end{lstlisting}
+本文提出利用声波感知技术来跟踪手写签名时的运动手部和笔的运动状态，进而推断是否为本人签名。声波对我们来说不是陌生的信号，我们用声带发射声波，用耳膜接收声波，以此来实现对这个世界的感知。普通的智能手机上的扬声器和麦克风便能发射和接收声波，近年来,声波感知研究大量涌现，比如轨迹追踪~\cite{wang2016device,mao2016cat,yun2017strata}、呼吸检测~\cite{WangContactless,wang2018c}、手势识别\cite{ruan2016audiogest,gupta2012soundwave,aumi2013doplink,ling2018ultragesture}、成像\cite{mao2017aim}等。
+假设声波信号的频率和传播速度分别是17000 Hz 和 346 m/s, 那么波长经计算为  $346/17000\approx0.02m$. 这么小的波长意味着声波的相位信息对周围物体的运动很敏感。本文采用声波的相关信息，利用计算弦的方法避开了求相位时去直流的问题，实现了微小动作的跟踪。
 
-\subsection{模板文件布局}
-\label{sec:layout}
 
-\begin{lstlisting}[basicstyle=\small\ttfamily,caption={模板文件布局},label=layout,float,numbers=none]
-├── LICENSE
-├── Makefile
-├── README.md
-├── bib
-│   ├── chap1.bib
-│   └── chap2.bib
-├── bst
-│   └── GBT7714-2005NLang.bst
-├── figure
-│   ├── chap2
-│   │   ├── sjtulogo.eps
-│   │   ├── sjtulogo.jpg
-│   │   ├── sjtulogo.pdf
-│   │   └── sjtulogo.png
-│   └── sjtubanner.png
-├── sjtuthesis.cfg
-├── sjtuthesis.cls
-├── statement.pdf
-├── submit.pdf
-├── tex
-│   ├── abstract.tex
-│   ├── ack.tex
-│   ├── app_cjk.tex
-│   ├── app_eq.tex
-│   ├── app_log.tex
-│   ├── chapter01.tex
-│   ├── chapter02.tex
-│   ├── chapter03.tex
-│   ├── conclusion.tex
-│   ├── id.tex
-│   ├── patents.tex
-│   ├── projects.tex
-│   ├── pub.tex
-│   └── symbol.tex
-└── thesis.tex
-\end{lstlisting}
+(2) 手写签名认证模型的研究
 
-本节介绍学位论文模板中木要文件和目录的功能。
+所有手写签名认证系统的大致框架前文已经有所提及，本文则针对声波的相位相关信息设计了合适的特征提取和用户独立的识别模型。手写签名动作所产生的影响在相位信号中体现为低频信号，而高频信号则是由环境或者硬件造成的噪声所产生。因此可以通过将时域数据转换到频域数据，然后提取低频系数的方法，将手写签名动作的信息提取出来。DFT是一种常见的获取频域数据的方法，但它的系数是2倍冗余的复数系数，所以我们采用DCT作为到频域数据的转换方法，并提取其前几个低频系数作为特征。当判别一个查询签名是否为真的时候，需要获取查询签名与模板签名之间的相似度，在此处，便是比较查询签名的特征与模板签名特征的之间的相似度。本文对多个模板签名的特征进行融合操作，获得几个固定数目的特征矩阵，查询签名的特征矩阵和这些矩阵作差获得相似矩阵。最后设计比传统分类器有更好表现的深度神经网络 (Deep Neural Network, DNN)\cite{Schmidhuber2015Deep} 作为一个二分类器，去分类相似矩阵。
 
-\subsubsection{格式控制文件}
-\label{sec:format}
+(3) 基于声波的手写签名认证的系统实现和性能评估分析
 
-格式控制文件控制着论文的表现形式，包括sjtuthesis.cfg和sjtuthesis.cls。
-其中，“cls”控制论文主体格式，“cfg”为配置文件。
+本文针对所提出的基于声波的手写签名认证的方案，利用三星Galaxy S6智能手机设计并实现基于声波的手写签名认证系统，并且对其进行了全面的评估，包括准确性的度量、鲁棒性测试、安全性测试、微基准测试、性能测试等。准确性测试以 AUC (Area Under Curve) 和 EER (Equal Error Rate) 作为度量指标。在鲁棒性测试中，改变环境、距离、日期来对系统进行测试，观察准确性的变化。在安全性测试中，是模拟重放攻击，从而测试系统对此类攻击的抵抗能力。在微基准测试中，改变一些超参数，来观察系统的变化，以便设置较合适的超参数。在性能测试中，度量系统延迟，来判断系统是否具有良好的用户体验和是否对硬件要求过高。
 
-\subsubsection{主控文件thesis.tex}
-\label{sec:thesistex}
 
-主控文件thesis.tex的作用就是将你分散在多个文件中的内容“整合”成一篇完整的论文。
-使用这个模板撰写学位论文时，你的学位论文内容和素材会被“拆散”到各个文件中：
-譬如各章正文、各个附录、各章参考文献等等。
-在thesis.tex中通过“include”命令将论文的各个部分包含进来，从而形成一篇结构完成的论文。
-对模板定制时引入的宏包，建议放在导言区。
+\subsection{研究创新点}
 
-\subsubsection{各章源文件tex}
-\label{sec:thesisbody}
+本文主要有如下两个方面的创新点：
+\begin{enumerate}[label=(\arabic*)]
+    \item 本文第一次提出使用声波感知技术来实现一个在线签名认证系统，并基于一个三星Galaxy S6智能手机实现了一个非侵入式、用户友好、安全、低延迟、准确的在线签名认证系统。而且相比于之前的声波感知技术，在避免去直流的前提下，提取到了相位相关信息，用以跟踪手写签名时所产生的微小的动作。
 
-这一部分是论文的主体，是以“章”为单位划分的，包括：
+    \item 本文针对新产生的信号，设计了特征提取方法和分类方法，并在进行了高效地实现。使用DCT提取信号中低频的有用的部分作为手写签名行为的特征，并使用深度学习进行分类，相比传统的分类方法获得了更好的表现。本文利用三星Galaxy S6智能手机设计并实现了基于声波的在线签名认证系统，全面评估了系统的性能。实验结果表明，本文提出的基于声波的在线签名认证系统的AUC可以达到98.7\%, EER可以达到5.5\%，并且是个安全、高效、鲁棒、低延迟的系统。
+\end{enumerate}
 
-\begin{itemize}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
-	\item 中英文摘要(abstract.tex)。前言(frontmatter)的其他部分，中英文封面、原创性声明、授权信息在sjtuthesis.cls中定义，不单独分离为tex文件。
-不单独弄成文件。
-	\item 正文(mainmatter)——学位论文正文的各章内容，源文件是chapter\emph{xxx}.tex。
-	\item 附录(app\emph{xx}.tex)、致谢(ack.tex)、攻读学位论文期间发表的学术论文目录(pub.tex)、个人简历(resume.tex)组成正文后的部分(backmatter)。
-参考文献列表由bibtex插入，不作为一个单独的文件。
-\end{itemize}
+\section{本文结构}
 
-\subsubsection{图片文件夹figure}
-\label{sec:fig}
+本文共分五章，每章的内容安排如下：
 
-figure文件夹放置了需要插入文档中的图片文件(支持PNG/JPG/PDF/EPS格式的图片)，可以在按照章节划分子目录。
-模板文件中使用\verb|\graphicspath|命令定义了图片存储的顶层目录，在插入图片时，顶层目录名“figure”可省略。
+第一章为绪论，主要阐述了手写签名认证研究的背景意义、国内外相关技术的发展现状、本文的研究内容以及主要的创新之处。
 
-\subsubsection{参考文献数据库bib}
-\label{sec:bib}
+第二章是手写签名认证相关技术的分析，首先分别从手写签名认证中的感知技术和手写签名认证中的建模方法两个方面对现有的研究进行了综述，然后分析总结了现有研究存在的问题。基于存在的问题，提出了本文的技术路线，最后介绍了本文中所涉及到的相关理论和技术。
 
-目前参考文件数据库目录只存放一个参考文件数据库thesis.bib。
-关于参考文献引用，可参考第\ref{chap:example}章中的例子。
+第三章是基于声波的手写签名认证的关键技术研究，首先对要解决的问题进行了描述，然后提出一种基于声波的手写签名认证方案，该方案主要包含四个模块，对应了四种关键技术，然后依次对涉及到的声波相位相关信号感知技术、特征提取技术、相似性度量技术和深度学习模型进行了研究，详细描述了方案中各模块的设计思想和技术细节。
 
+第四章首先对基于声波的手写签名认证方案进行了实验验证以及分析，手写描述了实验方法和采集的数据集，提出验证指标和用于对比的方案，之后实验验证本文方案的识别性能，最后探究影响识别性能的主要因素。
+
+第五章基于本研究提出的基于声波的手写签名认证方案实现了一个基于安卓智能手机的手写签名认证系统，首先是对系统的用户需求进行分析，然后基于分析完成系统架构的设计，最后进行一系列评估实验来评估系统的性能效果。第六章是总结和展望，对本文的研究内容进行了总结，同时针对本文存在的不足，对未来的工作进行了一定的展望，并提出了系统可以改进的关键点。
+
+\chapter{手写签名认证相关技术分析}
+\label{chap:related-work}
+目前手写签名认证的任务呈现普适性、便利性、模型用户无关的发展趋势，对实施技术的要求越来越高，在本章中我们将首先介绍手写签名认证研究综述，分析总结现有的研究存在的问题，然后针对存在的问题提出本文的技术路线，最后对本文涉及到的相关理论与技术进行介绍。
+\section{手写签名认证研究综述}
+手写签名认证研究所涉及到的技术领域比较广泛，如传感器技术、图像技术、通信技术、机器学习等等。应用这些技术需要解决的最核心的问题主要是两点，即“签名行为的数据怎么采集”和“采集到的数据怎么处理”。所以在手写签名认证的研究综述中，本文分别从手写签名认证中的感知技术和手写签名认证中的建模方法两方面进行综述。
+\subsection{手写签名认证中的感知技术}
+(1) 基于惯性传感器的手写签名认证
+  
+在手写签名的过程中，签名者通过手和笔的运动来留下签名字迹，运动过程中，手和笔的运动加速度和方向会发生变化，因此可以通过给手或者笔配备惯性传感器来实现对此运动过程的记录。常见的惯性传感器包括加速度计和陀螺仪，这两个惯性传感器均可产生三维的时间序列数据，分别记录物体线加速度和角运动，用于描述物体在三位空间中的运动状态。装配方式有两种：将惯性传感器装在手上，如智能腕表；将惯性传感器装在笔上。
+
+\begin{figure}
+  \centering
+  \begin{minipage}[t]{0.3\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/smartwatch.pdf}
+      \bicaption{用腕表上惯性传感器}
+      {Using inertial sensors on swatches}
+        \label{fig:smartwatch-inertial-sensor}
+  \end{minipage}
+  \centering
+  \begin{minipage}[t]{0.49\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/acceleration-pen.pdf}
+    \bicaption
+    {用笔上的惯性传感器}
+    {Using inertial sensors on pens}
+    \label{fig:pen-inertial-sensor}
+   \end{minipage}
+\end{figure}
+如图~\ref{fig:smartwatch-inertial-sensor}所示，基于腕表，Alona~\cite{Levy2018Handwritten}等人提出一种可穿戴的手写签名认证系统，它使用一个戴在签名手上的智能腕表上的惯性传感器和加速度计实现对签名动作的记录，虽然腕表目前的普及率还选不如智能手机，但腕表仍在受到大众的欢迎，所以这种方法具有普适性。Isaac\cite{8698222}等人使用腕表是实现了在多个场景下的手写身份识别，并对多种不同强度的攻击方式进行评估。使用如图~\ref{fig:pen-inertial-sensor}所示，基于笔上的加速度计，Bunke~\cite{Bunke2015Online}等人在普通笔的笔尖附近贴上了一个带线的加速度计，通过细带电缆将加速度时间序列传输到电脑端，依此分析签名动作。
+
+(2) 基于扫描图像的的手写签名认证
+\begin{table}[!hpb]
+  \centering
+  \bicaption
+    {真实签名与仿造签名图像}
+    {Genuine and forged signatures}
+  \label{tab:signatures-images}
+  \begin{tabular}{|c|m{0.2\textwidth}|m{0.2\textwidth}|m{0.2\textwidth}|} \toprule 
+    类型 & 真实签名 & 熟练仿造签名 & 不熟练仿造签名\\ \midrule
+   简单& \includegraphics[width=0.2\textwidth]{figure/signature-1.png}&\includegraphics[width=0.2\textwidth]{figure/signature-2.png}&\includegraphics[width=0.2\textwidth]{figure/signature-3.png} \\ \midrule
+    草书&\includegraphics[width=0.2\textwidth]{figure/signature-4.png}&\includegraphics[width=0.2\textwidth]{figure/signature-5.png}&\includegraphics[width=0.2\textwidth]{figure/signature-6.png} \\ \midrule
+    图形&\includegraphics[width=0.2\textwidth]{figure/signature-7.png}&\includegraphics[width=0.2\textwidth]{figure/signature-8.png}&\includegraphics[width=0.2\textwidth]{figure/signature-9.png} \\ 
+        \bottomrule
+  \end{tabular}
+\end{table}
+
+如图~\ref{tab:signatures-images}所示，在图像上，签名通常可以被分为三类~\cite{Hanmandlu2005Off}：简单的、草书的、图形的签名。简单的签名便是平时的普通签名；草书签名是写的过程有比划连在一起的签名；图形的签名则是用草书方式描述几何模式的签名。从图像上真实签名、熟练仿造签名、不熟练仿造签名之间有很大相似之处，但是细看不同之处也有很多。离线签名认证利用这些从纸上扫描出来的图像进行识别。
+
+Madasu~\cite{Hanmandlu2005Off}等让签名者使用黑笔在白纸上签名，之后使用扫描仪以200 dpi的分辨率扫描获得图像，并经过50\%的重采样将像素点数量减少到原来的一半。40个志愿参与数据集构建，每个志愿者提供15个真实签名和15个仿造签名，总共2400个签名图像。Subhash~\cite{chandra2016offline}等人邀请了18个志愿者，每个志愿者提供15个真实签名和15个仿造签名，总共540个尺寸为$850\times360px$的签名图像。除了自己手机签名数据集外，目前公开的签名图像数据集有：MCYT\footnote{http://atvs.ii.uam.es/atvs/mcyt75so.html}、CEDAR\footnote{https://cedar.buffalo.edu/Databases/CDROM1/}、Brazilian PUC-PR~\cite{freitas2008brazilian}. 签名的公开数据库文字上以英文居多，Brazilian PUC-PR则提供巴西葡萄牙语的签名数据。采集签名的方式，最传统的可以直接让志愿者写在纸上，然后扫描，这种方式较为费力。而最近，可以让签名者将签名写在平板上，仅仅使用静态轨迹数据就可以作为离线签名的数据集，同时兼顾离线签名认证研究和在线签名认证研究对数据集的需求。
+
+(3) 基于手写平板设备的手写签名认证
+
+\begin{figure}[!htp]
+  \centering
+  \includegraphics[width=0.5\textwidth]{figure/tablet.png}
+  \bicaption
+    {在平板上签名}
+    {Signing on a tablet}
+  \label{fig:signing-tablet}
+\end{figure}
+如图~\ref{fig:signing-tablet}所示，签名使用使用手写笔在平板上签名，由平板记录签名轨迹，手写屏除了记录轨迹还能记录压力值，如果使用智能笔则还能记录笔的倾斜角，因此时间序列数据可以包括：采样点的二位坐标、笔尖压力值、笔的水平偏角和垂直偏角。Alona~\cite{Levy2018Handwritten}等人在用腕表上惯性传感器跟踪签名动作时候，同时用手写记录签名轨迹，将平板上轨迹数据除了可以提给仿造者提供仿造学习材料，还可以用于和两个经典系统~\cite{fischer2015robust,kholmatov2005identity}做对比实验。目前，可用于在线签名认证研究的公开数据集有：MCYT-100\footnote{http://atvs.ii.uam.es/atvs/mcyt100s.html}、SUSIG~\cite{kholmatov2006sigsa}、SVC2004~\cite{10.1007/978-3-540-25948-0_3}、SCUT-MMSIG~\cite{10.1007/978-3-319-69923-3_78}等。
+
+MCYT-100是MCYT数据库的一个子集，包含100个签名者的数据，每个签名者有25个真实签名和25个仿造签名，总共5000个签名样本。至于SUSIG数据库，Kholmatov~\cite{kholmatov2006sigsa}等人使用一个分辨率为300 dpi、具有128层垂直压力感知、100 Hz采样率的压力感知触摸平板，邀请110位志愿者参与真实签名的收集，其中包括年龄在21岁到52岁之间的29位女性和81位男性，每个位志愿者分两个时间段提供20个真实签名，而仿造签名由仿造者观看签名过程并联系后为每个真实签名者提供5个仿造签名，他们同时用实验结果签名是一个复杂度取决于签名者的生物特征。SV2004是2004年香港科技大学举办在线认证比赛提供的数据库，针对比赛中的两个任务，该数据库提供两个数据集，每个数据集都包含100个签名集合，每个签名集合包含20真实签名和20熟练仿造签名，不同是其中一个数据集只包含坐标时间序列，而另外数据集则还包含笔的方向和压力，两个数据集前40个集合完全不同，而后60个集合仅仅是笔的方向和压力不同。比赛中，成绩最好的第一个任务EER=2.84\%,第二个任务EER=2.89\%。SVC2004包含中文签名和英文签名，SCUT-MMSIG则是由华南理工大学采集的纯中文签名，所以如果做针对中文签名认证研究的研究者可以考虑这两个签名数据作为评估数据集。
+
+此领域的研究者基于公开数据集做了很多工作。算法~\cite{kholmatov2005identity}提出SVC2004是的冠军提出。2015年提出的一个算法~\cite{fischer2015robust}在两个数据集上进行了评估，在MCYT数据集上使用5个模板签名时在随机仿造(random forger)和熟练仿造(skilled forger)情况下的EER分别为1.06\%和3.94\%，在SUSIG数据集使用5个模板签名时在随机仿造和熟练仿造情况下的EER分别为1.34\%和3.09\%。
+
+\subsection{手写签名认证中的建模方法}
+
+
+
+\section{现有研究存在的问题}
+\section{本文的技术路线}
+\section{相关理论与技术简介}
+\section{本章小结}
+
+% \section{使用模板}
+
+% \subsection{准备工作}
+% \label{sec:requirements}
+
+% 要使用这个模板撰写学位论文，需要在\emph{TeX系统}、\emph{TeX技能}上有所准备。
+
+% \begin{itemize}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
+% 	\item {\TeX}系统：所使用的{\TeX}系统要支持 \XeTeX 引擎，且带有ctex 2.x宏包，以2017年或更新版本的\emph{完整}TeXLive、MacTeX发行版为佳。
+% 	\item TeX技能：尽管提供了对模板的必要说明，但这不是一份“ \LaTeX 入门文档”。在使用前请先通读其他入门文档。
+% 	\item 针对Windows用户的额外需求：学位论文模本分别使用git和GNUMake进行版本控制和构建，建议从Cygwin\footnote{\url{http://cygwin.com}}安装这两个工具。
+% \end{itemize}
+
+% \subsection{模板选项}
+% \label{sec:thesisoption}
+
+% sjtuthesis提供了一些常用选项，在thesis.tex在导入sjtuthesis模板类时，可以组合使用。
+% 这些选项包括：
+
+% \begin{itemize}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
+% 	\item 学位类型：bachelor(学位)、master(硕士)、doctor(博士)，是必选项。
+% 	\item 中文字体：fandol(Fandol 开源字体)、windows(Windows 系统下的中文字体)、mac(macOS 系统下的华文字体)、ubuntu(Ubuntu 系统下的文泉驿和文鼎字体)、adobe(Adobe 公司的中文字体)、founder(方正公司的中文字体)，默认根据操作系统自动配置。
+% 	\item 英文模版：使用english选项启用英文模版。
+% 	\item 盲审选项：使用review选项后，论文作者、学号、导师姓名、致谢、发表论文和参与项目将被隐去。
+% \end{itemize}
+
+% \subsection{编译模板}
+% \label{sec:process}
+
+% 模板默认使用GNUMake构建，GNUMake将调用latemk工具自动完成模板多轮编译：
+
+% \begin{lstlisting}[basicstyle=\small\ttfamily, caption={编译模板}, numbers=none]
+% make clean thesis.pdf
+% \end{lstlisting}
+
+% 若需要生成包含“原创性声明扫描件”的学位论文文档，请将扫描件保存为statement.pdf，然后调用make生成submit.pdf。
+
+% \begin{lstlisting}[basicstyle=\small\ttfamily, caption={生成用于提交的学位论文}, numbers=none]
+% make clean submit.pdf
+% \end{lstlisting}
+
+% 编译失败时，可以尝试手动逐次编译，定位故障。
+
+% \begin{lstlisting}[basicstyle=\small\ttfamily, caption={手动逐次编译}, numbers=none]
+% xelatex -no-pdf thesis
+% biber --debug thesis
+% xelatex thesis
+% xelatex thesis
+% \end{lstlisting}
+
+% \subsection{模板文件布局}
+% \label{sec:layout}
+
+% \begin{lstlisting}[basicstyle=\small\ttfamily,caption={模板文件布局},label=layout,float,numbers=none]
+% ├── LICENSE
+% ├── Makefile
+% ├── README.md
+% ├── bib
+% │   ├── chap1.bib
+% │   └── chap2.bib
+% ├── bst
+% │   └── GBT7714-2005NLang.bst
+% ├── figure
+% │   ├── chap2
+% │   │   ├── sjtulogo.eps
+% │   │   ├── sjtulogo.jpg
+% │   │   ├── sjtulogo.pdf
+% │   │   └── sjtulogo.png
+% │   └── sjtubanner.png
+% ├── sjtuthesis.cfg
+% ├── sjtuthesis.cls
+% ├── statement.pdf
+% ├── submit.pdf
+% ├── tex
+% │   ├── abstract.tex
+% │   ├── ack.tex
+% │   ├── app_cjk.tex
+% │   ├── app_eq.tex
+% │   ├── app_log.tex
+% │   ├── chapter01.tex
+% │   ├── chapter02.tex
+% │   ├── chapter03.tex
+% │   ├── conclusion.tex
+% │   ├── id.tex
+% │   ├── patents.tex
+% │   ├── projects.tex
+% │   ├── pub.tex
+% │   └── symbol.tex
+% └── thesis.tex
+% \end{lstlisting}
+
+% 本节介绍学位论文模板中木要文件和目录的功能。
+
+% \subsubsection{格式控制文件}
+% \label{sec:format}
+
+% 格式控制文件控制着论文的表现形式，包括sjtuthesis.cfg和sjtuthesis.cls。
+% 其中，“cls”控制论文主体格式，“cfg”为配置文件。
+
+% \subsubsection{主控文件thesis.tex}
+% \label{sec:thesistex}
+
+% 主控文件thesis.tex的作用就是将你分散在多个文件中的内容“整合”成一篇完整的论文。
+% 使用这个模板撰写学位论文时，你的学位论文内容和素材会被“拆散”到各个文件中：
+% 譬如各章正文、各个附录、各章参考文献等等。
+% 在thesis.tex中通过“include”命令将论文的各个部分包含进来，从而形成一篇结构完成的论文。
+% 对模板定制时引入的宏包，建议放在导言区。
+
+% \subsubsection{各章源文件tex}
+% \label{sec:thesisbody}
+
+% 这一部分是论文的主体，是以“章”为单位划分的，包括：
+
+% \begin{itemize}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
+% 	\item 中英文摘要(abstract.tex)。前言(frontmatter)的其他部分，中英文封面、原创性声明、授权信息在sjtuthesis.cls中定义，不单独分离为tex文件。
+% 不单独弄成文件。
+% 	\item 正文(mainmatter)——学位论文正文的各章内容，源文件是chapter\emph{xxx}.tex。
+% 	\item 附录(app\emph{xx}.tex)、致谢(ack.tex)、攻读学位论文期间发表的学术论文目录(pub.tex)、个人简历(resume.tex)组成正文后的部分(backmatter)。
+% 参考文献列表由bibtex插入，不作为一个单独的文件。
+% \end{itemize}
+
+% \subsubsection{图片文件夹figure}
+% \label{sec:fig}
+
+% figure文件夹放置了需要插入文档中的图片文件(支持PNG/JPG/PDF/EPS格式的图片)，可以在按照章节划分子目录。
+% 模板文件中使用\verb|\graphicspath|命令定义了图片存储的顶层目录，在插入图片时，顶层目录名“figure”可省略。
+
+% \subsubsection{参考文献数据库bib}
+% \label{sec:bib}
+
+% 目前参考文件数据库目录只存放一个参考文件数据库thesis.bib。
+% 关于参考文献引用，可参考第\ref{chap:example}章中的例子。
