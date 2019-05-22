@@ -33,7 +33,7 @@
 
 信息技术将签名认证方式进行了自动化，自动签名认证系统得到研究和应用。 自动签名认证系统根据捕捉签名的方式不同，可以被分为两大类：离线签名认证系统和在线签名认证系统。 离线签名认证系统依靠签名图像的静态数据进行签名的比较来识别，而在线签名认证系统则依靠用户书写过程中记录下的时间序列数据（如书写速度、笔的压力等）来进行比较和识别。由于，外加的时间维度信息，通常在线签名认证系统的表现由于离线签名认证系统。
 
-\begin{figure}[!htp]address
+\begin{figure}[!htp]
   \centering
   \includegraphics[width=0.7\textwidth]{figure/verification-work-flow.pdf}
   \bicaption
@@ -198,11 +198,154 @@ Kai~\cite{huang1997off}等人提取了签名图像的多种粒度的局部对比
 DTW是一种非常经典用于计算两个不同长度的序列距离的算法，其在模式识别中的应用十分广泛。然而，DTW技术具有两个明显的缺点：(1)计算开销大，需要更多时间；(2)对仿造签名进行规整使得验证更加困难。而且HMM模型是无记忆性的，它的当前状态只与其前一个状态有关，无法利用更多复杂信息。使用深度学习进行用户无关的模型训练会引发巨大的训练开销，而且越是复杂的网络要求有足够大的数据集防止其过拟合。目前的系统大多在公开数据集进行测试，过于追求精度的提升，很少有度量在识别时间上的开销，因此复杂的方法在时间中不一定可行。
 
 \section{本文的技术路线}
-本文通过深入分析现有研究，针对目前手写签名认证中的感知技术和手写签名认证中的建模方法的研究中存在的问题，提出了本文的技术路线。技术路线如图2–3所示，其中主要分为具有递进关系的四种技术研究，分别是音频设备硬件补偿技术、基于声波的相位相关信息的感知技术、基于声波的相位相关信息的特征提取技术、基于声波特征的建模技术。其中的箭头表示了这几种技术步骤之间的依赖关系，下面将分别介绍这四种技术。
+\begin{figure}[!htp]
+  \centering
+  \includegraphics[width=0.4\textwidth]{figure/technique-road.pdf}
+  \bicaption
+    {本文的技术路线}
+    {The technology roadmap}
+  \label{fig:technology-roadmap}
+\end{figure}
+本文通过深入分析现有研究，针对目前手写签名认证中的感知技术和手写签名认证中的建模方法的研究中存在的问题，提出了本文的技术路线。技术路线如图~\ref{fig:technology-roadmap}所示，其中主要分为具有递进关系的四种技术研究，分别是音频设备硬件补偿技术、基于声波的相位相关信息的感知技术、基于声波的相位相关信息的特征提取技术、基于声波特征的建模技术。其中的箭头表示了这几种技术步骤之间的依赖关系，下面将分别介绍这四种技术。
+
+(1) 音频设备硬件补偿技术
+
+本文的数据采集和原型系统实现基于智能手机上的音频设备。然而，智能手机上的音频设备主要用于娱乐、通信、降噪等，其主要设计用途并不包括声波感知，因此当时利用智能手机发送高频的声波信号(17 kHz以上)，尤其是同时发送多个高频声波信号时，每个频率说声波实际发送能量差异可能会很大。本文针对智能手机上的音频设备的硬件不足，进行了硬件补偿，以便目标频率声波的发射能量不至于太小。
+
+(2) 基于声波的相位相关信息的感知技术
+
+从麦克风设备中获得是一个原始的音频数据，其中包括了人交谈的声音、环境噪音等可听见和不可听见的声音。这些可见的声波信号并不是本文所需要的，我们需要对原始的接收信号进行下转换以后获得两个经降采样的正交信号，这两个正交信号可用于计算相位。相位信息声波的传播路径长度成直接相关，因此环境中一些周期性运动，比如笔记本散热器叶片的转动，会对相位信息产生影响。因此，需要对两个正交信号进行去噪，然后提取相位相关的信息。
+
+(3) 基于声波的相位相关信息的特征提取技术
+
+声波的相位信息和声波传播路径直接相关，签名时手的运动，引起声波传播路径长度的变化，从而导致相位的波动。而手的运动对相位的影响呈现为低频信号，高频信号则为噪声。本文使用DCT将相位相关信号从时域转换到频域，取低频系数作为特征提取和选择的结果。
+
+(4) 基于声波特征的建模技术
+
+本文认为签名真确性的判别是个二分类问题。对一个用户，在收集模板签名之后，根据这些所有的模板签名的特征矩阵，计算出三个(最小值、最大值、平均值)用于参与和查询签名比较的矩阵，和查询签名的特征矩阵通过作差得出其余模板的距离矩阵。本文设计一个多层CNN模型，以距离矩阵作为输入，进行二分类。
 
 \section{相关理论与技术简介}
 
+\subsection{智能手机音频设备的位置和配置}
+\begin{figure}[!htp]
+  \centering
+  \includegraphics[width=0.7\textwidth]{figure/smartphone.pdf}
+  \bicaption
+    {智能手机上的音频设备}
+    {Audio devices on smartphones}
+  \label{fig:audio-device-smartphone}
+\end{figure}
+
+三星Galaxy S6是三星公司在2015年5月推出的一款智能手机，是本文原型系统ASSV使用的智能手机，因此以此为例进行说明。如图~\ref{fig:audio-device-smartphone}所示，该智能手机搭载了2个扬声器和2个麦克风：
+\begin{enumerate*}[label=\alph*)]
+    \item 一个降噪麦克风(Microphone-2)位于机身的上壁，对高频信号较为敏感，且原来用户打电话的时的发生点，可以用于记录背景噪声；
+    \item 一个主麦克风(Microphone-1)位于机身的下壁，对人声比较敏感(通常低于8 kHz)，用于记录通话语音；
+    \item 一个通话扬声器(Speaker-2)位于屏幕上部，用于通话是对准耳朵；
+    \item 一个主扬声器(Speaker-1)位于机身的下壁，位于主麦克风的旁边。
+\end{enumerate*}
+
+\begin{table}[!hpb]
+  \centering
+  \bicaption{三星Galaxy S6的硬件配置}{Hardware settings of Samsung Galaxy S6}
+  \label{tab:smartphone-hardware-setting}
+  \resizebox{\textwidth}{!}{
+\begin{tabular}{|l|l|l|}
+\hline
+\multirow{2}{*}{Body}     & Dimensions  & 143.4 x 70.5 x 6.8 mm (5.65 x 2.78 x 0.27 in)                          \\ \cline{2-3} 
+                          & Weight      & 138 g (4.87 oz)                                                                            \\ \hline
+\multirow{4}{*}{Platform} & OS          & Android 5.0.2 (Lollipop), upgradable to Android 8.0 (Oreo); TouchWiz UI \\ \cline{2-3} 
+                          & Chipset     & Exynos 7420 Octa (14 nm)                                                \\ \cline{2-3} 
+                          & CPU         & Octa-core (4x2.1 GHz Cortex-A57 \& 4x1.5 GHz Cortex-A53)                \\ \cline{2-3} 
+                          & GPU         & Mali-T760MP8                                                            \\ \hline
+\multirow{2}{*}{MEMORY}   & Card slot   & No                                                                      \\ \cline{2-3} 
+                          & Internal    & 32/64/128 GB, 3 GB RAM                                                  \\ \hline
+\multirow{4}{*}{Sound}    & Loudspeaker & Yes                                                                     \\ \cline{2-3} 
+                          & 3.5mm jack  & Yes                                                                     \\ \cline{2-3} 
+                          &             & 24-bit/192kHz audio                                                     \\ \cline{2-3} 
+                          &             & Active noise cancellation with dedicated mic                            \\ \hline
+\multirow{5}{*}{Battery}  &             & Non-removable Li-Ion 2550 mAh battery                                   \\ \cline{2-3} 
+                          & Charging    & Fast battery charging 15W                                               \\ \cline{2-3} 
+                          &             & Qi/PMA wireless charging (market dependent)                             \\ \cline{2-3} 
+                          & Talk Time   & Up to 17 h (3G)                                                         \\ \cline{2-3} 
+                          & Music play  & Up to 49 h                                                              \\ \hline
+\end{tabular}
+}
+\end{table}
+该型号智能手机的硬件配置如表~\ref{tab:smartphone-hardware-setting}~\footnote{https://www.gsmarena.com/samsung\_galaxy\_s6-6849.php}所示，其具有较好的计算性能和较大的内存空间，支持24-bit/192kHz的音频设备，可以满足我们的对设备的要求。值得注意的是，从CPU型号上可得知，内存存储模式为小端模式，数据的低字节保存在内存的低地址。
+
+\subsection{声波信号下转化}
+\begin{figure}[!htp]
+  \centering
+  \includegraphics[width=0.7\textwidth]{figure/down-conversion.pdf}
+  \bicaption
+    {声波信号下转化}
+    {Sound signal down conversion}
+  \label{fig:sound-signal-down-conversion}
+\end{figure}
+假设智能手机上的麦克风的采样率设置为48 kHz。由于接收和发射声波的设备在同一智能手机，共享一个时钟频率，因此接收端和发送端之间不存在载频偏移(Carrier Frequency Offset, CFO)。因此，使用图~\ref{fig:sound-signal-down-conversion}所示的传统的相干解调器结构将所接收到的声波信号下转化为基带信号~\cite{tse2005fundamentals}。接收信号被分成两份副本，分别乘以发射信号$-cos2\pi ft$和它的相位偏移信号$-sin2\pi ft$，再经过一个低通滤波器获得同相(In-phase)和正交(Quadrature)分量。
+
+LLAP~\cite{wang2016device}中对信号下转化的过程进行了解释。为了更好得理解数字下转化过程，我们假设一个信号路径$p$的路径长度随时间变化的函数为$d_p\left( t\right)$。来自信号路径$p$可以表示为:
+$$
+R_{p}\left( t\right) = 2A^{'}_{p}cos \left( 2\pi ft - 2\pi fd_{p}\left( t \right) / c - \theta_{p} \right),
+$$
+其中，$2A^{'}_{p}$是接收信号的强度，$2\pi fd_{p}\left( t \right)/c$是产生于传播延迟$\tau=d_{p}\left(t\right)/c$的相位间隔，$c$是声音传播速度。初始相位$\theta_p$是硬件延迟和由于反射而发生相位反转的结果。按照图~\ref{fig:sound-signal-down-conversion}中的结构，我们将接收信号乘以$cos\left( 2\pi ft \right)$，得到：
+\begin{equation}\nonumber
+\begin{aligned}
+&2A_{p}^{'}cos \left( 2\pi ft - 2\pi fd_{p}\left( t\right)/c - \theta_{p} \right) \times cos\left( 2\pi ft\right) \\ 
+= \quad &A_{p}^{'}\left( cos\left( -2\pi fd_{p}\left( t\right)/c - \theta_{p} \right) + cos\left( 4\pi ft - 2\pi fd_{p}\left( t\right)/c - \theta_{p} \right)  \right).
+\end{aligned}
+\end{equation}
+第二个子项的频率为$2f$，属于高频，可以被低通滤波器所去除。所以我们可以获得基带信号的同相分量(I-component)为：
+$$
+I_{p}\left( t\right) = A_{p}^{'}cos \left( -2\pi fd_{p}\left( t\right)/c - \theta_{p} \right).
+$$
+相似地，我们可以获得正交分量(Q-component)为：
+$$
+Q_{p}\left( t\right)=A_{p}^{'}sin\left( -2\pi fd_{p}\left(t \right)/c - \theta_{p} \right).
+$$
+结合这两个分量，分别作为复数的实部和虚部，我们可以得到复数形式的基带信号($j^2=-1$):
+$$
+B_{p}\left( t\right) = A_{p}^{'}e^{-j\left( 2\pi fd_{p}\left( t\right)/c + \theta_{p} \right)}.
+$$
+因此，在路径$p$上的相位为：
+$$
+\phi_{p}\left( t\right) = -\left( 2\pi fd_{p}\left( t\right)/c + \theta_{p} \right),
+$$当$d_{p}\left(t\right)$变化一个声波波长的长度$\lambda = c/f$时，相位$\phi_{p}\left( t\right)$变化$2\pi$。
+\subsection{离散余弦变换}
+DCT~\cite{ahmed1974discrete}是一种正交变换，可以用于实现一个维纳滤波器和模式识别中的特征选择。正交变换和逆变换在维纳滤波器中充当重要角色。在模式识别中，DCT可以用于特征选择，对原始数据进行降维，以便于进行分类。一个序列$X(m),m=0,1,\cdots,(M-1)$的DCT可以为定义为:
+\begin{equation}
+\label{equ:dct}
+\begin{aligned}
+G_{x}\left( 0\right) &= \frac{\sqrt{2}}{M} \sum_{m=0}^{M-1}X\left( m\right), \\
+G_{x}\left( k\right) &= \frac{2}{M} \sum_{m=0}^{M-1}X\left( m\right)cos\frac{\left(2m+1\right)k\pi}{2M}, k=1,2,\cdots,(M-1).
+\end{aligned}
+\end{equation}
+$G_{x}(k)$是第k个DCT系数。值得注意的是，基向量集合$\{ 1/\sqrt{2}, cos((2m+1)k\pi)/(2M) \}$实际上是一组离线切比雪夫多项式。
+DCT的逆变换(Inverse Discrete Consine Transform, IDCT)可以被定义为：
+\begin{equation}
+\label{equ:idct}
+X(m) = \frac{1}{\sqrt{2}}G_{x}(0) + \sum_{k=1}^{M-1}G_{x}(k)cos\frac{(2m+1)k\pi}{2M}, m=0,1,\cdots,(M-1). 
+\end{equation}
+在性能上，DCT好于离散傅里叶变换，接近于最优的Karhunen-Loeve Transform (KLT)。DCT的算法最简单的可以根据上诉的公式进行计算，原文\cite{ahmed1974discrete}中提出了可以使用快速傅里叶变换进行高效计算，之后研究者们提出了一些高效算法~\cite{winograd1978computing,lee1984new,hou1987fast}。
+
+\subsection{卷积神经网络}
+\begin{figure}[!htp]
+  \centering
+  \includegraphics[width=0.4\textwidth]{figure/convolution-process.pdf}
+  \bicaption
+    {卷积过程}
+    {Convolution process}
+  \label{fig:convolution-process}
+\end{figure}
+CNN~\cite{goodfellow2016deep}是一种用于处理网格状数据的特殊ANN，通常包括两类操作：卷积和池化操作，在图像处理领域得到广泛应用。通常被实现为交叉相关函数的卷积操作，在一个输入2维图像(也可以是更高纬的张量)和一个卷积核上生成一个如下的特征图：
+$$
+S(i,j)=(K\times I)(i,j)=\sum_{m}\sum_{n}I(i+m,j+n)K(m,n),
+$$
+其中，$I$、$K$、$S$分别是输入图像、卷积核和特征图。图~\ref{fig:convolution-process}演示了一个在二维张量上的卷积运算过程。稀疏交互、参数共享和等变表示是卷积运算中的三个思想，三个思想之间互相影响，是的卷积神经网络只需要较少的模型参数便能实现可靠地特征提取。池化函数使用某个位置的相邻输出的总体统计特征来代替网络在该位置的输出，可对输入进行降维，为神经网络在提供了某种程度平移不变性，常用的池化函数有：最大池化函数、平均池化函数等。
+
+
 \section{本章小结}
+本章是手写签名认证相关技术的分析，首先分别从手写签名认证中的感知技术和手写签名认证中的建模方法两个方面对现有的研究进行了综述，然后分析总结了现有研究存在的问题。基于存在的问题，提出了本文的技术路线，最后介绍了本文中所涉及到的相关理论和技术。
 
 % \section{使用模板}
 
