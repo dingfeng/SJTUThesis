@@ -331,7 +331,7 @@ X(m) = \frac{1}{\sqrt{2}}G_{x}(0) + \sum_{k=1}^{M-1}G_{x}(k)cos\frac{(2m+1)k\pi}
 \subsection{卷积神经网络}
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=0.4\textwidth]{figure/convolution-process.pdf}
+  \includegraphics[width=0.6\textwidth]{figure/convolution-process.pdf}
   \bicaption
     {卷积过程}
     {Convolution process}
@@ -380,8 +380,105 @@ $$
 在两个场景中，我们默认认证参考签名已经预先被系统记录下。场景二本文系统所适用的场景，对签证者来说，他/她的操作包括：获取支票、寻找签名区域、拿笔准备写、开启声波跟踪、开始手写、结束手写、结束声波跟踪、获得验证结果。智能手机可以在场景中使用声波跟踪签名过程中手和笔的运动模式。虽然这个注意听起来十分鼓舞人心，但是使用智能手机收发声波跟踪手和笔运动实现在线认证的方案仍然面临着诸多挑战：首先，个人的签名仍然可以被观察和练习，这是目前所有签名认证系统所面临和需要克服的挑战；另外，声波可以被其他恶意的音频接收设备所接收，之后再播放出来实行重放攻击。
 
 \subsection{方案设计}
+\begin{figure}[!htp]
+  \centering
+  \includegraphics[width=\textwidth]{figure/system-architecture.pdf}
+  \bicaption
+    {基于声波的手写签名认证方案}
+    {Acoustic-based handwritten signature verification method}
+  \label{fig:acoustic-hsv-method}
+\end{figure}
+针对上述问题，本文设计提出了一种基于声波的签名认证方案，如图~\ref{fig:acoustic-hsv-method}所示。该方案主要将声波感知技术引入到手写签名认证的研究中，同时为适应手写签名认证的问题，增加了一系列数据处理技术来完成了方案的设计。该方案共包含四个关键步骤：声波收发、声波相位相关信息采集、特征提取、分类模型。下面依次对每个步骤进行简单介绍。
+
+(1) 声波收发
+
+在发射声波声波之前，首先我们需要设计使用扬声器发射的音频文件，这个音频文件的设计需要考虑用户体验、系统可用性、系统鲁棒性这些特点，而且还需要适配扬声器的硬件特性，进行相应的硬件补偿。
+
+
+(2) 声波相位相关信息采集
+
+在收到声波反射信号之后，对声波信号进行向下转换从而获得基带信号的两个正交分量。通常在求相位之前，需要对这两个正交分量去直流，然后计算出相位信号，但是在这两个正交信号变化过于多样时，去直流变成异常困难。我们使用了求弦长的方法，估算了相关相关信息(速度和加速度)。其中，除了解决去直流问题，还需要预先对两个正交信号进行去噪。
+
+
+(3) 特征提取
+
+尽管声波的相关信息是经过降采样的而得，他的数据量仍然较大，不宜直接进行分类。在这个步骤中，对信号进行频域分析，对信号做余弦变换，选择低频信息作为特征，并计算查询签名与参考签名之间的距离矩阵。
+
+(4) 分类模型
+
+本文采用CNN作为二分类的分类模型。模型在调整好参数和使用一些防止过拟合的方法后，使用上一步骤中中距离矩阵作为输入，进行二分类，输出一个范围为0到1的概率值，输出值越大表明输入签名是真是签名的概率越大。
 
 \section{音频设备硬件补偿技术的研究}
+
+本节先介绍原型系统ASSV中的声波信号的设计理念，然后针对设计好的声波信号结合智能手机采取硬件补偿措施。
+
+(1) 声波信号的设计
+
+用于在智能手机上发射声波实际上是使用扬声器播放一个按特定目的设计的音频信号，因此关于声波信号的设计，实际就是关于音频文件中二进制数据序列的设计。为了让麦克风上接收信号可分析，本文设计一种特定的声音让扬声器去发射。在此设计中，本文主要考虑三个方面：用户体验、系统可用性、系统鲁棒性。
+
+\textbf{\textit{(a)} 声波信号设计需要考虑用户体验。}为了让系统提供用户友好型的交互和良好的用户体验，由智能手机发送的声波不应该是可听见的。根据Rodr{\'\i}guez Valiente~\cite{rodriguez2014extended}等人的综叙，当声波的频率高于17 kHz的时候，声音对人便变得不可听。因此，本文生成的声波的频率均大于17 kHz，而且这些声波均可以被商用音频设备(包括本文所用到的智能手机上的扬声器)发射。
+
+\textbf{\textit{(b)} 声波信号设计需要考虑系统可用性。}与LLAP~\cite{wang2016device}中所发射的声波信号相似，为了测量随着传播路径变化的声波信号的相位，ASSV生成声波信号的时候也使用连续波(Continuous Wave, CW)信号:
+$$
+Acos2\pi ft, 
+$$
+其中$A$代表信号强度，而$f$代表信号频率。再则，ASSV使用同一个智能手机上的扬声器和麦克风来发射和接收声波，这连个音频设备使用同一个是时钟频率，所以不存在载频偏移问题。如图~\ref{fig:audio-device-smartphone}所示，本文使用的手机上存在两个2个扬声器和2个麦克风。
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[b]{0.49\textwidth}
+    \includegraphics[width=\textwidth]{figure/signal-path-pen-hand-reflected-path}
+    \caption{}
+    \label{fig:signal-path-pen-hand-reflected-path}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+    \includegraphics[width=\textwidth]{figure/signal-path-direct-path}
+    \caption{}
+    \label{fig:signal-path-direct-path}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+    \includegraphics[width=\textwidth]{figure/signal-path-static-multipath}
+    \caption{}
+    \label{fig:signal-path-static-multipath}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+    \includegraphics[width=\textwidth]{figure/signal-path-dynamic-multipath}
+    \caption{}
+    \label{fig:signal-path-dynamic-multipath}
+  \end{subfigure}
+  \bicaption[信号传播路径]
+  {信号传播路径 - (a) 手和笔的反射路径; (b) 直接路径; (c) 静止路径; (d) 动态多径。\textbf{S}, \textbf{M}, \textbf{P}, \textbf{B} 分别代表 扬声器(\textbf{S}peaker), 麦克风(\textbf{M}icrophone), 笔(\textbf{P}en), 障碍物(\textbf{B}lock)。}
+  {Signal traveling paths - (a) Hand and pen reflected path; (b) Direct path; (c) Static multipath; (d) Dynamic multipath. \textbf{S}, \textbf{M}, \textbf{P}, \textbf{B} represent \textbf{S}peaker, \textbf{M}icrophone, \textbf{P}en, \textbf{B}lock respectively.}
+  \label{fig:signal-travel-paths}
+\end{figure}
+
+\textbf{\textit{(c)} 声波信号设计需要系统鲁棒性。}ASSV需要在需要保持鲁棒性，即使多径效应丰富的环境下也需要保持可用的。如图~\ref{fig:signal-travel-paths}所示，我们将声波的传播路径分成4种类型：手和笔的反射路径、直接路径、静止路径和动态多径。
+第一种类型，如图~\ref{fig:signal-path-pen-hand-reflected-path}所示，信号从扬声器发出，经过笔和手的反射，传播回到麦克风中。该路径长度随着手写动作的进行而发生变化，实际上，路径是跟踪签名活动中人的行为特征的真正所需要的路径；
+第二种类型，本文称这种路径为直接路径。如图~\ref{fig:signal-path-direct-path}所示，信号从直接从扬声器传播到麦克风，没有经任何物体反射。因为直接传播路径所有可能传播路径中最短的一条，所以从直接路径上传播的信号具有最大的能量，换而言之，具有最大的信号波振幅；
+第三种类型，本文称这种路径为静止路径。如图~\ref{fig:signal-path-static-multipath}所示，声波仅仅被障碍物反射了一次，图中的障碍物可以是桌子、人的身体等一些在智能附近的禁止可以阻挡声音的障碍物。直接路径和禁止路径传播的声波信号在本文被看作背景信号，手写签名过程中手和笔的运动并不能对背景信号产生丝毫影响；
+第四种类型，如图~\ref{fig:signal-path-dynamic-multipath}所示，声波信号从扬声器出发，经过手写过程中的手和笔的反射，再次经过障碍物的反射，最后才传播回到麦克风中。因为障碍物是不确定的，通常是由形状不规则的非结构化的的物体组成，所以经过这种路径传播的声波信号总体上被认为是不稳定和不确定的。
+
+本文使用信号的指数形式来解释最终的接受信号。假设$x_{i}^{'}(t)=A_{i}^{'}e^{-a_{i}^{'}t},x_{j}^{''}(t)=A_{j}^{''}e^{-a_{j}^{''}t},x_{m}^{'''}(t)=A_{m}^{'''}e^{-a_{m}^{'''}t},x_{n}^{''''}(t)=A_{n}^{''''}e^{-a_{n}^{''''}t}$分别表示第一种类型、第二种类型、第三种类型、第四种类型路径中其中一条路径的信号，其中$i,j,m,n$是正整数用于表示“其中一条路径”的意思。假设$X^{'}(t),X^{''}(t),X^{'''}(t),X^{''''}(t)$分别表示四种类型路径上信号的和，$I,J,M,N$分别代表四种类型路径集合中各自的路径数量，我们可以得到：
+\begin{eqnarray}
+X^{'}(t) &=\quad  \sum_{i=1}^{I}x_{i}^{'}(t)      &=\quad   \sum_{i=1}^{I}A_{i}^{'}e^{-a_{i}^{'}t} \\
+X^{''}(t) &=\quad  \sum_{j=1}^{J}x_{j}^{''}(t)     &=\quad  \sum_{j=1}^{J}A_{j}^{''}e^{-a_{j}^{''}t} \\
+X^{'''}(t) &=\quad   \sum_{m=1}^{M}x_{m}^{'''}(t)    &=\quad   \sum_{m=1}^{M}A_{m}^{'''}e^{-a_{m}^{'''}t} \\
+X^{''''}(t) &=\quad   \sum_{n=1}^{N}x_{n}^{''''}(t)  &=\quad   \sum_{n=1}^{N}A_{n}^{''''}e^{-a_{n}^{''''}t}
+\end{eqnarray}
+$X(t)$表示麦克风接收的信号，则可以得到：
+\begin{equation}\nonumber
+\begin{aligned}
+
+
+\end{aligned}
+\end{equation}
+
+总之，第一种传播路径是本文所关心的，第二种和第三种传播路径比较稳定是可以被去除的，而第四种传播路径是我们在设计声波信号着重需要考虑的。通常，结合来自不同频率上的信号的结果可以缓解第四种类型的传播路径最后对结果的影响，这用方法可以被用于提高估计跟踪或者活动识别的精度。
+
+本文选择多个频率高于17 kHz的声波信号组成最后的发射信号。看似所选用的不同的频率的信号越多则越有利于缓解动态多径所产生的影响，但是实际上并不能这样， 不同频率之间存在临频干扰。
+
+
+
 \section{基于声波的相位相关信息的感知技术的研究}
 \section{基于声波的相位相关信息的特征提取技术的研究}
 \section{基于声波特征的建模技术的研究}
