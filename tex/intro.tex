@@ -412,7 +412,7 @@ $$
 
 本节先介绍原型系统ASSV中的声波信号的设计理念，然后针对设计好的声波信号结合智能手机采取硬件补偿措施。
 
-(1) 声波信号的设计
+\subsection{声波信号的设计}
 
 用于在智能手机上发射声波实际上是使用扬声器播放一个按特定目的设计的音频信号，因此关于声波信号的设计，实际就是关于音频文件中二进制数据序列的设计。为了让麦克风上接收信号可分析，本文设计一种特定的声音让扬声器去发射。在此设计中，本文主要考虑三个方面：用户体验、系统可用性、系统鲁棒性。
 
@@ -480,11 +480,173 @@ X(t)=\sum_{i=1}^{I}A_{i}^{'}e^{-a_{i}^{'}t} + \sum_{j=1}^{J}A_{j}^{''}e^{-a_{j}^
 
 等式~\ref{eq:path-total-final}中，第一项是我们所关心可用于跟踪手写行为的变量，第二项与第三项是可以认为是常量，第四项是不稳定变化的。第二项和第三项可以通过作差法去除。第四项，第四种传播路径是我们在设计声波信号着重需要考虑的。通常，结合来自不同频率上的信号的结果可以缓解第四种类型的传播路径最后对结果的影响，这用方法可以被用于提高估计跟踪或者活动识别的精度。
 
-本文选择多个频率高于17 kHz的声波信号组成最后的发射信号。根据香浓采样定理，麦克风在采样频率为48 kHz时，可接收的声波频率不应高于24 kHz，实际由于硬件原因，这个上限会更小。看似所选用的不同的频率的信号越多则越有利于缓解动态多径所产生的影响，但是实际上并不能这样，频率越多，每个频率上的信号分得的能量便越小，能量减小导致信噪比下降。本文通过实验来解释这个现象，分两次发射不同的声波，第一次发生18 kHz声波，第二次发射 18 kHz 和 18.6 kHz的声波，每次发射3秒，取最后一秒利用快速傅里叶变换(Fast Fourier Transform, FFT)进行频域分析。
+\begin{figure}
+  \centering
+  \begin{minipage}[t]{0.49\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/one-freq-fft.pdf}
+      \bicaption{单频率声波频域分析}
+      {Frequency analysis on one-frequency sound}
+        \label{fig:frequency-analysis-one-frequency}
+  \end{minipage}
+  \centering
+  \begin{minipage}[t]{0.49\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/two-freq-fft.pdf}
+    \bicaption
+    {双频率声波频域分析}
+    {Frequency analysis on two-frequency sound}
+    \label{fig:frequency-analysis-two-frequency}
+   \end{minipage}
+\end{figure}
+
+本文选择多个频率高于17 kHz的声波信号组成最后的发射信号。根据香浓采样定理，麦克风在采样频率为48 kHz时，可接收的声波频率不应高于24 kHz，实际由于硬件原因，这个上限会更小。看似所选用的不同的频率的信号越多则越有利于缓解动态多径所产生的影响，但是实际上并不能这样，频率越多，每个频率上的信号分得的能量便越小，能量减小导致信噪比下降。本文通过实验来解释这个现象，分两次发射不同的声波，第一次发生18 kHz声波，第二次发射 18 kHz 和 18.6 kHz的声波，每次发射3秒，取最后一秒利用快速傅里叶变换(Fast Fourier Transform, FFT)进行频域分析。如图~\ref{fig:frequency-analysis-one-frequency}和图~\ref{fig:frequency-analysis-two-frequency}所示，双频率声波的18 kHz和18.6 kHz频率上的能量相加才是单频声波的18 kHz频率上的能量。本文采用8个频率合成发射声波，在ASSV中，所选的频率集合$S_{freq}$可以表示为：
+$$
+S_{freq}=  \left\lbrace f | f=17350+700i, i \in \left[ 0,7 \right] \cap \mathbb{N} \right\rbrace,
+$$
+其中，8个频率开始频率为17350 Hz，每个频率所占频带和抗干扰保护频带分别为200 Hz和500 Hz。8个不同频率的信号被计算并标准化到取值范围$[-1,1]$,如下所示：
+$$
+Signal=\frac{1}{|S_{freq}|}\sum_{f \in S_{freq}}cos 2\pi ft.
+$$
+
+\subsection{音频设备硬件补偿}
+
+\begin{figure}[!htp]
+  \centering
+  \includegraphics[width=0.6\textwidth]{figure/nocompensation.pdf}
+  \bicaption
+    {在硬件补偿之前的频域效果}
+    {Frequency-domain effect without dardware compensation}
+  \label{fig:nocompensation}
+\end{figure}
+
+由于智能手机的扬声器不是专为本的声波信号而设计的，能量在不同频率的信号上不是均匀分布的。如图~\ref{fig:nocompensation}所示，通过对1秒时间的接收信号进行傅里叶变换，我们观察到有些频率上的信号能量十分小，而有些频率上的信号能量比较大。由于低能量的信号会导致低信噪比(signal-to-noise ratio, SNR)，本文需要使用针对音频设备硬件的补偿技术。本文使用一个启发式的硬件补偿方法：
+\begin{enumerate*}[label=(\arabic*)]
+    \item 发射声波信号$Signal$ 5秒钟，挑选出第3秒这一秒的数据序列，这个数据序列在采样率为48 kHz的情况下一秒的数据有48000个数据点。
+    \item 对所选的数据序列进行傅里叶变换，从而获得所选频率上的幅度。假设$f_{i} = 17350 + 700i$代表第$ith$频率，$A_{i}$代表对傅里叶变换所得复数系数进行$abs$操作，$abs$是一个Python中计算绝对值的函数。
+    \item 将发射声波$Signal$替换为$Signal_{compensated}=\alpha \sum_{i=0}^{|S_{freq}|-1} \frac{1}{A_i} cos 2\pi f_{i}t$，其中$\alpha$是幅度缩放系数以保证$\alpha \sum_{i=0}^{|S_{freq}|-1}\frac{1}{A_i}=1$。
+\end{enumerate*}
+
 
 
 
 \section{基于声波的相位相关信息的感知技术的研究}
+为了获得接收声波中的相位相关信息，需要先对接收信号进行下转化(signal down conversion)，然后根据获得的两个正交分量估量相位相关信息。
+
+\subsection{信号下转化}
+在估量相位相关信息之前，首先需要对接收信号进行信号下转化，将信号从通带信号(passband signal)转化为基带信号(baseband signal)。这个过程在LLAP~\cite{wang2016device}中有所描述，本文重点描述与其的不同之处。
+
+为了易于实现ASSV，本文使用巴特沃斯低通滤波器(low-pass Butterworth filter)作为所需的低通滤波器，而不是Cascaded Integrator Comb (CIC)滤波器。不失一般性，本文首先描述单一频率声波信号的信号下转化过程。如图~\ref{fig:sound-signal-down-conversion}所示，在此过程中，接收信号分两条分支进行操作：其中分支中，接收信号乘以$cos2\pi ft$并紧跟一个低通滤波操作，获得基带信号的同相分量(In-phase, I)；另外一个分支中，接收信号乘以$-sin2\pi ft$并紧跟一个低通滤波操作，获得基带信号的正交分量(Quadrature, Q)。对两个分支经低通滤波获得的输出进行降采样，将数据量缩小到原来的$1/300$。既然在扬声器上的声波发射频率和麦克风上的声波接收频率均为48 kHz，所以最后数据的采样率是160 Hz。 这个其实是一个计算开销和判别准确性之间的一个折衷。
+
+\begin{figure}[!htp]
+  \centering
+  \includegraphics[width=0.6\textwidth]{figure/noisy-I.pdf}
+  \bicaption
+    {有噪声和去噪后的同相分量}
+    {Noisy and denoised In-phase components}
+  \label{fig:noisy-denoised-component}
+\end{figure}
+如图~\ref{fig:noisy-denoised-component}所示，首先我们可以看到充满噪声的同相分量的曲线。既然我们在实验室里做实验，同时有研究生在实验室里说话，有空调在运行，有个人电脑的散热器在转动，所以接收信号受到丰富的环境噪声影响。虽然大多数噪声（比如人说话的声音）已经被低通滤波器所滤去，一些噪声仍然存在于基带信号中。在同相和正交分量中，我们可以发现可以一个周期约为10的噪声信号，图~\ref{fig:noisy-denoised-component}展示了同相分量中的噪声。这样的周期性噪声可以通过一下三个步骤进行测量:
+\begin{enumerate*}[label=(\arabic*)]
+    \item 在没有手写动作影响的情况下，获得一段主要受到环境噪声影响的同相或者正交分量；
+    \item 使用一个基于函数的方法找出这段曲线中的所有的波峰；
+    \item 计算两个波峰之间时间间隔的平均值，用于估算噪声的波动周期。
+\end{enumerate*}
+获得噪声信号的周期之后，本文直接在时域信号上使用另外一个基于函数的趋势季节分解(Trend-Seasonal Decomposition, STD)~\cite{cleveland1990stl}方法，该方法使用滑动平均的方式实现。STD函数要求输入一个周期，即使用波峰之间时间间隔估算出的周期，分解后之后我们可以获得三个序列：
+\begin{enumerate}[label=(\arabic*)]
+    \item 趋势序列。趋势序列包含低频信号，本文中该低频信号随着手写动作的变化而变化；
+    \item 季节序列。季节是一个周期性序列，其周期是调用STD时所输入的值；
+    \item 残差序列。残差序列是一个这样的一个序列，为了满足相加模型：$Y[t] = T[t] + S[t] + e[t]$，其中，$Y[t]$代表原始序列，$T[t]$代表趋势序列，$S[t]$代表残差序列。
+\end{enumerate}
+\begin{figure}[!htp]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figure/std-effect.pdf}
+  \bicaption
+    {趋势季节分解效果}
+    {Trend-Seasonal Decomposition Effect}
+  \label{fig:trend-seasonal-decomposition-effect}
+\end{figure}
+图~\ref{fig:trend-seasonal-decomposition-effect}展示分解效果，从上到下的子图分别是原始序列、趋势序列、季节序列和残差序列。在STD的输出序列中，本文只采用趋势序列最为结果序列。如图~\ref{fig:noisy-denoised-component}所示，充满的噪声的是原始序列，而相对平滑的是趋势序列，该图展现STD在本文中良好的去噪声效果。
+
+在本文中，我们使用的是离线版本的STD，只有当声波信号被全部接收和下转化之后，STD才能对整个信号使用。既然该基于函数的方法使用滑动平均的方法，STD实际上可以被实现成在线版本STD2~\cite{std2},在线版本更适用于实际应用，可以减少延迟。
+
+\subsection{估量相位相关信息}
+为了更好地理解估计相位相关信息的方法，我们首先展示2个关键发现，然后使用它们的数学原理。
+
+\begin{figure}[!htp]
+  \centering
+  \includegraphics[width=0.7\textwidth]{figure/large-magnitude-movement.pdf}
+  \bicaption
+    {大幅度运动}
+    {Large-magnitude movements}
+  \label{fig:large-magnitude-movements}
+\end{figure}
+
+\begin{figure}[!htp]
+  \centering
+  \includegraphics[width=0.7\textwidth]{figure/medium-magnitude-movement.pdf}
+  \bicaption
+    {中等幅度运动}
+    {Medium magnitude movements}
+  \label{fig:medium-magnitude-movements}
+\end{figure}
+
+\begin{figure}[!htp]
+  \centering
+  \includegraphics[width=0.7\textwidth]{figure/small-magnitude-movement.pdf}
+  \bicaption
+    {小幅度运动}
+    {Small magnitude movements}
+  \label{fig:small-magnitude-movements}
+\end{figure}
+
+\textbf{第一个关键发现。}我们研究三种运动模式下的相位变化：(a) 在每个方向都有中等幅度移动的运动;(b)在每个方向都有较小移动的运动;(c)在每个方向只有较小幅度的移动。当智能手机上扬声器和麦克风启动，同相和正交分量的幅度从零开始持续增加到一个稳定的值，这个阶段在ASSV中大约持续1秒时间，正如图~\ref{fig:large-magnitude-movements}、图~\ref{fig:medium-magnitude-movements}和图~\ref{fig:small-magnitude-movements}中路径$O\rightarrow S$所示。这三幅图展示了三种运动模式下的I/Q变化轨迹，其中点C是运动轨迹的中心，而x轴和y轴分别代表同相分量(I-component)和正交分量(Q-component)。深入地查看这三幅图，如果视点C为圆心，我们发现圆弧的度数就是相位的大小。 为了计算这个度数，$C(x_{0},y_{0})$的位置需要从同相分量和正交分量的序列估计出来。如图~\ref{fig:large-magnitude-movements}所示，对于每个方向上都有大幅度移动的运动模式，这种运动模式会造成相位在同一个方向(顺时针方向)上运动较长时间。在这种情况下，$x_0$和$y_0$通过分别计算同相分量和正交分量的平均值而得到。如图~\ref{fig:medium-magnitude-movements}所示，对于每个方向上都有中等幅度移动的运动模式，相位变化的方向变化较快，以致于同相分量和正交分量不是均匀分布，而是集中在\textit{Area 1}，但是同相分量和正交分量的最小值和最大值还是达到了。这种情况下，第一种情况中所使用的方法则不再适用，但是仅仅依赖于最小值和最大值的方法LEVD~\cite{wang2016device}仍然可以工作得很好。如图~\ref{fig:small-magnitude-movements}所示，对于每个方向上的移动都比较小的运动，相位的改变方向发生过于频繁的变化。这种情况是手写运动中，相位变化最常见的一种模式，在之前情况中所使用的方法将不适用。换句话说，在这种情况下，计算$x_{0}$和$y_{0}$变得很有挑战性。
+
+\textbf{第二个关键发现。}我们研究了相位和弦长度变化之间的关系。对于半径一定的圆，我们可以得出一个结论，越大的弦长意味着越大的圆心角，而圆心角在本文中就是相位(图~\ref{fig:large-magnitude-movements}、图~\ref{fig:medium-magnitude-movements}和图~\ref{fig:small-magnitude-movements})。基于这个观察，一个衡量弦长变化的方法被提出用于估量相位相关的信息，而非直接计算相位。
+
+\begin{figure}[!htp]
+  \centering
+  \includegraphics[width=0.7\textwidth]{figure/estimation-geometry.pdf}
+  \bicaption
+    {I/Q估计的上离散点}
+    {Discrete points on the I/Q trace}
+  \label{fig:discrete-point-trace}
+\end{figure}
+
+假设$I[t]$和$Q[t]$分别是同相分量和正交分量序列，其中$t=1,2,3,...,n$。图~\ref{fig:discrete-point-trace}展示了表示$I[t]$和$Q[t]$的二维形状。$P_k$是一个在I/Q轨迹上的离散点，它的坐标是$(I[t],Q[t])$,其中$k=1,2,...,n$。$\theta_{k}$是对应于弦$P_{k}P_{k+1}$的圆心角。既然半径在很短的时间变化很小(在ASSV中为6 ms)，我们可以得出：
+$$
+\begin{cases} 
+  \theta_{k} \leq \theta_{k+1}, & \text{for } P_{k}P_{k+1} \leq P_{k+1}P_{k+2}  \\
+  \theta_{k} > \theta_{k+1},  & \text{for } P_{k}P_{k+1} > P_{k+1}P_{k+2}
+\end{cases}
+.
+$$
+所以弦长的变化可以用于估量相位的变化。进一步，假设半径为$r$，我们使用数学方法证明这个推理，使其更有说服力：
+\begin{align}
+\Delta Chord_{k,k+1} &= \left\|P_{k+1}P_{k+2}\right\| - \left\|P_{k}P_{k+1}\right\|  \\ \label{eq:phase-approx}
+&= 2rsin\frac{\theta_{k+1}}{2} - 2rsin\frac{\theta_{k}}{2} \nonumber \\  
+&= 2r\left(sin\frac{\theta_{k+1}}{2} - sin\frac{\theta_{k}}{2}\right)  
+.
+\end{align}
+利用$sin$的泰勒展式的第一项，我们得到：
+\begin{align}
+   sin\frac{\theta_{k+1}}{2} \approx \frac{\theta_{k+1}}{2} , sin\frac{\theta_{k}}{2} \approx \frac{\theta_{k}}{2}. \label{eq:taylor-series}
+\end{align}
+将等式~\eqref{eq:phase-approx}代入等式~\eqref{eq:taylor-series}，我们得到：
+\begin{equation}
+ \Delta Chord_{k,k+1} \approx r(\theta_{k+1} - \theta_{k})=r\Delta \theta_{k,k+1} \Rightarrow \Delta \theta_{k,k+1} \approx \frac{1}{r}\Delta Chord_{k,k+1}.  \label{eq:velocity}
+\end{equation}
+虽然半径$r$仍然是未知的，但是，考虑到当$r$保持相同的时候，$\Delta \theta_{k,k+1}$和$\Delta Chord_{k,k+1}$成正相关变化。因为$\Delta Chord$序列和相位变化的速度相关，所以相位相关的加速度可以通过计算$\Delta Chord$的导数而进一步获得：
+\begin{equation}
+Acceleration_{k} = \frac{\left( \Delta Chord_{k,k+1} - \Delta Chord_{k-1,k} \right) + \left( \Delta Chord_{k+1,k+2}- \Delta Chord_{k-1,k}\right)/2}{2}. \label{eq:acceleration}
+\end{equation}
+相比起只用两个点的计算方法，这种估计方式更具有鲁棒性。
+既然$\left\|P_{k}P_{k+1}\right\|$在ASSV中可以被计算为：
+\begin{equation}
+  \left\|P_{k}P_{k+1}\right\|= \sqrt{\left( I[k+1] - I[k] \right)^2 + \left( Q[k+1] - Q[k] \right)^2}
+\end{equation}
+相似地，计算$\left\|P_{k+1}P_{k+2}\right\|$，然后将$\left\|P_{k}P_{k+1}\right\|$和$\left\|P_{k+1}P_{k+2}\right\|$代入等式\eqref{eq:velocity}中。然后，使用估计所得的$\Delta Chord $和等式~\eqref{eq:acceleration}，$Acceleration$可以被计算得到。
+
 \section{基于声波的相位相关信息的特征提取技术的研究}
 \section{基于声波特征的建模技术的研究}
 \section{本章小结}
