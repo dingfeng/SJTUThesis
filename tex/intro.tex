@@ -312,6 +312,7 @@ $$
 \phi_{p}\left( t\right) = -\left( 2\pi fd_{p}\left( t\right)/c + \theta_{p} \right),
 $$当$d_{p}\left(t\right)$变化一个声波波长的长度$\lambda = c/f$时，相位$\phi_{p}\left( t\right)$变化$2\pi$。
 \subsection{离散余弦变换}
+\label{sec:dct}
 DCT~\cite{ahmed1974discrete}是一种正交变换，可以用于实现一个维纳滤波器和模式识别中的特征选择。正交变换和逆变换在维纳滤波器中充当重要角色。在模式识别中，DCT可以用于特征选择，对原始数据进行降维，以便于进行分类。一个序列$X(m),m=0,1,\cdots,(M-1)$的DCT可以为定义为:
 \begin{equation}
 \label{equ:dct}
@@ -408,7 +409,7 @@ $$
 
 本文采用CNN作为二分类的分类模型。模型在调整好参数和使用一些防止过拟合的方法后，使用上一步骤中中距离矩阵作为输入，进行二分类，输出一个范围为0到1的概率值，输出值越大表明输入签名是真是签名的概率越大。
 
-\section{音频设备硬件补偿技术的研究}
+\section{音频设备硬件补偿技术的研究}\label{sec:audio-research}
 
 本节先介绍原型系统ASSV中的声波信号的设计理念，然后针对设计好的声波信号结合智能手机采取硬件补偿措施。
 
@@ -529,8 +530,7 @@ $$
 
 
 
-
-\section{基于声波的相位相关信息的感知技术的研究}
+\section{基于声波的相位相关信息的感知技术的研究}\label{sec:sensing-research}
 为了获得接收声波中的相位相关信息，需要先对接收信号进行下转化(signal down conversion)，然后根据获得的两个正交分量估量相位相关信息。
 
 \subsection{信号下转化}
@@ -552,11 +552,11 @@ $$
     \item 使用一个基于函数的方法找出这段曲线中的所有的波峰；
     \item 计算两个波峰之间时间间隔的平均值，用于估算噪声的波动周期。
 \end{enumerate*}
-获得噪声信号的周期之后，本文直接在时域信号上使用另外一个基于函数的趋势季节分解(Trend-Seasonal Decomposition, STD)~\cite{cleveland1990stl}方法，该方法使用滑动平均的方式实现。STD函数要求输入一个周期，即使用波峰之间时间间隔估算出的周期，分解后之后我们可以获得三个序列：
+获得噪声信号的周期之后，本文直接在时域信号上使用另外一个基于函数的趋势季节分解(Trend-Seasonal Decomposition, STD)~\cite{cleveland1990stl}方法，该方法使用滑动平均的方式实现。目前有乘法STD和加法STD；在乘法STD中，原始序列为趋势序列、季节序列和残差序列之积，适用于季节的幅度随着时间变大而变大的情形；在加法STD中，原始序列为趋势序列、季节序列和残差序列之和，适用于季节的幅度不随着时间的变化而变化。STD函数要求输入一个周期，即使用波峰之间时间间隔估算出的周期，分解后之后我们可以获得三个序列：
 \begin{enumerate}[label=(\arabic*)]
     \item 趋势序列。趋势序列包含低频信号，本文中该低频信号随着手写动作的变化而变化；
     \item 季节序列。季节是一个周期性序列，其周期是调用STD时所输入的值；
-    \item 残差序列。残差序列是一个这样的一个序列，为了满足相加模型：$Y[t] = T[t] + S[t] + e[t]$，其中，$Y[t]$代表原始序列，$T[t]$代表趋势序列，$S[t]$代表残差序列。
+    \item 残差序列。残差序列是一个这样的一个序列，为了满足相加模型：$Y[t] = T[t] + S[t] + e[t]$，其中，$Y[t]$代表原始序列，$T[t]$代表趋势序列，$S[t]$代表季节序列，$S[t]$为残差序列。
 \end{enumerate}
 \begin{figure}[!htp]
   \centering
@@ -630,9 +630,10 @@ $$
 \end{align}
 利用$sin$的泰勒展式的第一项，我们得到：
 \begin{align}
-   sin\frac{\theta_{k+1}}{2} \approx \frac{\theta_{k+1}}{2} , sin\frac{\theta_{k}}{2} \approx \frac{\theta_{k}}{2}. \label{eq:taylor-series}
+   sin\frac{\theta_{k+1}}{2} \approx & \frac{\theta_{k+1}}{2} ,\label{eq:taylor-series1}\\ 
+    sin\frac{\theta_{k}}{2} \approx & \frac{\theta_{k}}{2}. \label{eq:taylor-series2}
 \end{align}
-将等式~\eqref{eq:phase-approx}代入等式~\eqref{eq:taylor-series}，我们得到：
+将等式~\eqref{eq:taylor-series1}和等式~\eqref{eq:taylor-series2}代入等式~\eqref{eq:phase-approx}，我们得到：
 \begin{equation}
  \Delta Chord_{k,k+1} \approx r(\theta_{k+1} - \theta_{k})=r\Delta \theta_{k,k+1} \Rightarrow \Delta \theta_{k,k+1} \approx \frac{1}{r}\Delta Chord_{k,k+1}.  \label{eq:velocity}
 \end{equation}
@@ -647,9 +648,158 @@ Acceleration_{k} = \frac{\left( \Delta Chord_{k,k+1} - \Delta Chord_{k-1,k} \rig
 \end{equation}
 相似地，计算$\left\|P_{k+1}P_{k+2}\right\|$，然后将$\left\|P_{k}P_{k+1}\right\|$和$\left\|P_{k+1}P_{k+2}\right\|$代入等式\eqref{eq:velocity}中。然后，使用估计所得的$\Delta Chord $和等式~\eqref{eq:acceleration}，$Acceleration$可以被计算得到。
 
+
+
 \section{基于声波的相位相关信息的特征提取技术的研究}
+\subsection{使用DCT的动机}
+经过上一步，我们可以获得声波信号的基带信号，里面包含了签名运动的信息。此基带信号的采样率为160 Hz，如果按一次签名6秒时间算，则一个频率上会获得960个数据点，8个频率上总共上7680个数据点，直接使用这7680个数据点进行分类，会导致分类器难以收敛，分类效果不佳。本文，采取将对时域信号进行频域分析。签名运动的信息通常被认为是包含在低频信号里，而噪声信息则存在于高频信号中。时频转换的常见方法有：离散小波变换(Discrete Wavelet Transform, DWT)、离散傅里叶变换(Discrete Fourier Transform, DFT)和离散余弦变换(Discrete Cosine Transform, DCT)。
+
+\begin{figure}[!htp]
+  \centering
+  \includegraphics[width=0.7\textwidth]{figure/stft.pdf}
+  \bicaption
+    {短时傅里叶变换}
+    {Short-time Fourier transform}
+  \label{fig:stft}
+\end{figure}
+小波变换~\cite{chun2010tutorial}和短时傅里叶变换(Short-time Fourier Transform, STFT)具有相似之处，都可以获得时域和频域信息。如图~\ref{fig:stft}所示，STFT使用一个滑动窗口，对窗口内的信号做快速傅里叶变换(Fast Fourier Transform, FFT)，从而获得时域信息和频域信息用于绘制频谱图，了解频率随时间的变化情况，其中滑动窗口大小和窗口移动步长可以进行设置。然而窗口的大小限制了离散傅里叶变换的频率分辨率，离散小波变换更好地解决了这个问题。我们可以通过以下方式估计一个$f[n] \in l_{2}(Z)$:
+\begin{equation}
+f[n] = \frac{1}{\sqrt{M}}\sum_{k} W_{\phi}[j_{0},k]\phi_{j_{0},k}[n] + \frac{1}{\sqrt{M}}\sum_{j=j_{0}}^{\infty}\sum_{k}W_{\phi}[j,k]\phi_{j,k}[n].
+\end{equation}
+其中，$f[n],\phi_{j_{0},k}[n]$ and $\phi_{j,k}[n]$ 是定义域为$[0,M-1]$,总共$M$个点的离散函数。集合$\{\phi_{j_{0},k}[n]\}$和集合$\{\phi_{j,k}[n]\}_{(j,k)\in Z^{2}, j \geq j_{0}}$相互正交。所以我们可以通过求内积的方式获得小波系数：
+\begin{align}
+W_{\phi}[j_{0},k]=&\frac{1}{\sqrt{M}}\sum_{n}f[n]\phi_{j_{0},k}[n]. \label{eq:approximation-efficients} \\
+W_{\psi}[j,k] =& \frac{1}{\sqrt{M}}\sum_{n}f[n]\psi_{j,k}[n],  j \geq j_{0}. \label{eq:detailed-efficients}
+\end{align}
+等式~\ref{eq:approximation-efficients}是近似系数，而等式~\ref{eq:detailed-efficients}是细节系数。近似系数中包含低频信息，而细节系数包含高频信息。如图~\ref{fig:dwt}所示，原始信号经过小波变换可以得到近似系数和细节系数，而近似系数和细节系数可以进一步进行小波变换，不断迭代，从而得到我们想要的那段频率范围内的信息。
+\begin{figure}[!htp]
+  \centering
+  \includegraphics[width=0.7\textwidth]{figure/dwt.pdf}
+  \bicaption
+    {小波变换}
+    {Discrete wavelet transform}
+  \label{fig:dwt}
+\end{figure}
+
+离散傅里叶变换是常用的将时频变换的方法，假设$X_{k}$是信号的振幅序列，则傅里叶系数可通过以下的方式求得：
+\begin{equation}
+X_{k} = \sum_{n=0}^{N-1}x[n] \cdot e^{-j\frac{2\pi kn}{N}} \quad n=0,...,N-1.  \label{eq:dft}
+\end{equation}
+而离散傅里叶逆变换则是以下形式：
+\begin{equation}
+ x_{n} = \frac{1}{N}\sum_{k=0}^{N-1}X_{k} \cdot e^{j\frac{2\pi}{N}kn} \quad n=0,...,N-1. \label{eq:idft}
+\end{equation}
+从计算公式可以看出，计算DFT的时间复杂度为$O(n^{2})$，计算过程中存在很多重复的过程数据，快速傅里叶变换(Fast Fourier Transform, FFT)是离散傅里叶变幻的快速算法，将时间复杂度降为$O(nlog n)$。N个点的傅里叶变化的频谱分辨率为$\frac{2\pi}{N}$，这就解释了短时傅里叶变换的局限性：窗口越大傅里叶变换粒度变细，但是窗口数量减少，需要在时域信息和频域信息的多少之间进行权衡。傅里叶系数是复数系数，从式子~\ref{eq:dft}可知，第一个系数实际为所有数据点的和，傅里叶系数上存在冗余。
+
+离散余弦变换与傅里叶变换相关，最初的算法就提出了使用傅里叶变换实现余弦变换，不同的是余弦变换是一种实数变换，不存在系数冗余，详细参考上文~\ref{sec:dct}。DCT的特点是前面系数包含低频信息，后面的系数包含高频信息，可以通过获取前几个系数来获得低频信息，不像离散小波变换需要经过多次变换才能获得所需的信息。因此，本文采用余弦变换用于特征提取和选择。
+
+\subsection{特征矩阵和距离矩阵}
+在描述特征提取和选择过程之前，首先介绍两种矩阵：特征矩阵和距离矩阵。对于特征矩阵来说，每个手写签名都具有一个特征矩阵，这个矩阵包含所有我们提取和选择到的特征。对距离矩阵来说，它度量了查询签名和参考签名之间的相似度。我们通常认为，如果一个查询签名和相对应的参考签名具有较高的相似度，那么这个查询签名更有可能是一个真实签名，如果一个查询签名和相对应的参考签名具有较高的不相似度，那么这个查询签名更有可能是一个假签名。
+
+对于每个接收的声波信号序列，因为在发送端有8个频率被使用到，因此可以获得8对 $\Delta Chord$和$Acceleration$序列。先将每个$\Delta Chord$或者$Acceleration$序列正规化到0-1的范围，然后采用DCT来获得信号的频域特征。DCT旨在实现数据的降维，它在信息包装和计算复杂度上有很好的权衡。不相关的DCT系数被产生，其中DCT系数的数量为输入序列的数据点数。前几个DCT系数通常被选取，而通常包含噪声信息的高阶系数通常被删除。结果，每个不同长度的时间序列都可以被转化为固定维度的特征向量。对于每个速度序列和加速度序列，我们经验性地选择前10个DCT系数。
+
+首先介绍特征矩阵，假设$W$是对于每个用户的参考签名数量。考虑8个频率，则特征向量的数量为$16*W$,其中包括$8*W$速度特征向量和$8*W$个加速度特征向量。对于每个参考签名，我们有8个速度特征矩阵，一个由这8个速度矩阵组成的形状为(8,10)的特征矩阵可以表示为：
+$$
+M_{i}^{vel}=\left( m^{vel}_{i,j,k}\right)_{8\times10} \quad i=1,2,..,W.
+$$
+接下来，我们计算：
+\begin{align} \nonumber
+   a_{j,k}^{vel} =& min\{m^{vel}_{i,j,k}|i=1,..,W\} \\
+   b_{j,k}^{vel} =& max\{m^{vel}_{i,j,k}|i=1,..,W\} \\
+   c_{j,k}^{vel} =& \frac{1}{W}\sum_{1}^{W}m^{vel}_{i,j,k},
+\end{align}
+进而得到三个矩阵：
+\begin{align}
+A^{vel} =& \left(a_{j,k}^{vel}  \right)_{8\times10} \label{eq:vel-feature-matrices-minimum}\\  
+B^{vel} =& \left( b_{j,k}^{vel} \right)_{8\times 10} \label{eq:vel-feature-matrices-maximum}\\ 
+C^{vel} =& \left( c_{j,k}^{vel} \right)_{8\times 10} ,  \label{eq:vel-feature-matrices-mean}
+\end{align}
+其中，矩阵~\ref{eq:vel-feature-matrices-minimum}是最小值矩阵，矩阵~\ref{eq:vel-feature-matrices-maximum}是最大值矩阵，矩阵~\ref{eq:vel-feature-matrices-mean}是平均值矩阵。
+
+对于加速度序列，我们有:
+$$
+M_{i}^{acce}=\left( m^{acce}_{i,j,k}\right)_{8\times10} \quad i=1,2,..,W.
+$$
+进而得到三个矩阵：
+\begin{align}
+A^{acce} =& \left(a_{j,k}^{acce}  \right)_{8\times10}  \label{eq:acce-feature-matrices-minimum} \\
+B^{acce} =& \left( b_{j,k}^{acce} \right)_{8\times10}  \label{eq:acce-feature-matrices-maximum} \\
+C^{acce} =& \left( c_{j,k}^{acce} \right)_{8\times 10} \label{eq:acce-feature-matrices-mean}
+\end{align}
+其中，矩阵~\ref{eq:acce-feature-matrices-minimum}是最小值矩阵，矩阵~\ref{eq:acce-feature-matrices-maximum}是最大值矩阵，矩阵~\ref{eq:acce-feature-matrices-mean}是平均值矩阵。
+
+结果，每个注册用户都有一个存在文件系统中的参考矩阵:
+$$
+S_{reference}=\left\{ a_{j,k}^{vel},b_{j,k}^{vel},c_{j,k}^{vel},a_{j,k}^{acce},b_{j,k}^{acce},c_{j,k}^{acce} \right\}.
+$$
+
+这里介绍距离矩阵。当收到一个需要进行验证的查询签名的时候，ASSV首先计算该签名的两个特征矩阵：$M^{vel}$ 和 $M^{acce}$。然后，ASSV计算6个距离矩阵，如下:
+\begin{align}
+M^{vel} -& A^{vel}  \label{eq:distance-1} \\
+M^{vel} -& B^{vel}  \label{eq:distance-2} \\
+M^{vel} -& C^{vel}  \label{eq:distance-3} \\
+M^{acce} -& A^{acce} \label{eq:distance-4} \\
+M^{acce} -& B^{acce} \label{eq:distance-5} \\
+M^{acce} -& C^{acce} \label{eq:distance-6}
+\end{align}
+结合式子~\ref{eq:distance-1}、式子~\ref{eq:distance-2}、式子~\ref{eq:distance-3}、式子~\ref{eq:distance-4}、式子~\ref{eq:distance-5}和式子~\ref{eq:distance-6}，我们一个获得一个三维的形状为$(8,10,6)$的矩阵，该矩阵将被作为分类模型的输入，用于训练和测试。
+
+总而言之，特征矩阵用于进一步产生距离矩阵，而距离矩阵则被作为分类模型的输入。
+
+\subsection{算法}
+
+到目前为止，结合上文音频设备硬件补偿技术的研究~\ref{sec:audio-research}和基于声波的相位相关信息的感知技术的研究~\ref{sec:sensing-research}，我们可以计算特征矩阵、参考矩阵和距离矩阵。算法~\ref{alg:get-feature-vector}用于计算特征向量。基于算法~\ref{alg:get-feature-matrix},可得出计算特征矩阵的算法。
+
+\begin{algorithm}
+\caption{获得特征向量}
+\label{alg:get-feature-vector}
+\begin{algorithmic}[1]
+\Procedure{GET\_FEATURE\_VECTOR}{$data,f,dctNum$}\Comment{data是接收到的离散声波信号,f是声波频率,dctNum为dct索取系数数量}
+\State $FreqRate \gets 48000$           \Comment{采样率为48 kHz}
+\State $I \gets [], Q \gets []$  \Comment{初始化I-component和Q-component}
+\State $dataLen \gets$ getLengthof $data$  \Comment{获得data的数据点数量}
+\State $i \gets 0$
+\While{$i < dataLen$} \Comment{遍历数据点}
+\State $I[i]=data[i]*cos(\frac{2\pi fi}{FreqRate})$
+\State $Q[i]=data[i]*(-sin(\frac{2\pi fi}{FreqRate}))$
+\State $i \gets i + 1$
+\EndWhile\label{euclidendwhile}
+\State $I \gets $ DownSample $\gets $ LowPassFilter $I$   \Comment{获得I-component}
+\State $Q \gets $ DownSample $\gets $ LowPassFilter $Q$   \Comment{获得Q-component}
+\State $I\_seasonal,I\_trend,I\_resid \gets$ seasonal decompose $I$      \Comment{趋势季节分解}
+\State $Q\_seasonal,Q\_trend,Q\_resid \gets$ seasonal decompose $Q$  
+\State $j \gets 1$
+\State $\Delta Chord \gets []$
+\While{$j < getLengthOf(I\_trend)$} \Comment{遍历数据点}
+\State $\Delta Chord[j-1] \gets \sqrt{(I[j]-I[j-1])^{2} + (Q[j]-Q[j-1])^{2}}$
+\State $j \gets j + 1$
+\EndWhile\label{euclidendwhile}
+\State $k \gets 1$
+\State $Acceleration \gets []$
+\While{$k < getLengthOf(\Delta Chord)-1$} \Comment{遍历数据点}
+\State $Acceleration[k-1] \gets \frac{(\Delta Chord[k+1] - \Delta Chord[k]) + (\Delta Chord[k+1] - \Delta Chord[k])/2}{2}$
+\State $k \gets k + 1$
+\EndWhile\label{euclidendwhile}
+\State $VelocityFeatureVector \gets dct(\Delta Chord)[:dctNum]$
+\State $AccelerationFeatureVector \gets dct(Acceleration)[:dctNum]$
+\State \textbf{return} $VelocityFeatureVector,AccelerationFeatureVector$\Comment{返回结果}
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[!htp]
+\caption{获得特征矩阵}
+\label{alg:get-feature-matrix}
+\begin{algorithmic}[1]
+\Procedure{GET\_FEATURE\_MATRIX}{$data$} \Comment{data是接收到的离散声波信号}
+\State $BaseFrequency \gets 17350, FreqNum \gets 8, dctNum \gets 10$ \Comment{初始化起始频率、频率数目和DCT系数数目}
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
 \section{基于声波特征的建模技术的研究}
 \section{本章小结}
+
 
 
 \chapter{基于声波的签名认证方案的实验}
@@ -661,11 +811,13 @@ Acceleration_{k} = \frac{\left( \Delta Chord_{k,k+1} - \Delta Chord_{k-1,k} \rig
 \section{经典系统对比实验}
 \section{重放攻击实验}
 
+
 \chapter{基于声波的签名认证方案的系统设计与实现}
 \section{系统需求分析}
 \section{系统设计与实现}
 \section{系统性能评估}
 \section{本章小结}
+
 
 \chapter{总结与展望}
 \section{工作总结}
