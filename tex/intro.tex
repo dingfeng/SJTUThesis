@@ -748,8 +748,6 @@ M^{acce} -& C^{acce} \label{eq:distance-6}
 
 \subsection{算法}
 
-到目前为止，结合上文音频设备硬件补偿技术的研究~\ref{sec:audio-research}和基于声波的相位相关信息的感知技术的研究~\ref{sec:sensing-research}，我们可以计算特征矩阵、参考矩阵和距离矩阵。算法~\ref{alg:get-feature-vector}用于计算特征向量。基于算法~\ref{alg:get-feature-matrix},可得出计算特征矩阵的算法。
-
 \begin{algorithm}
 \caption{获得特征向量}
 \label{alg:get-feature-vector}
@@ -793,13 +791,48 @@ M^{acce} -& C^{acce} \label{eq:distance-6}
 \begin{algorithmic}[1]
 \Procedure{GET\_FEATURE\_MATRIX}{$data$} \Comment{data是接收到的离散声波信号}
 \State $BaseFrequency \gets 17350, FreqNum \gets 8, dctNum \gets 10$ \Comment{初始化起始频率、频率数目和DCT系数数目}
+
+\State $VelocityFeatureVectors \gets []$  \Comment{初始化速度特征向量列表}
+\State $AcceleratinoFeatureVectors \gets []$ \Comment{初始化加速度特征向量列表}
+\State $freqIndex \gets 0$ 
+\While{$freqIndex < FreqNum$} \Comment{遍历数据点}
+\State $freq \gets BaseFrequency + freqIndex\times 700$
+\State $VelocityFeatureVector,AccelerationFeatureVector \gets  GET\_FEATURE\_VECTOR(data, freq, dctNum)$
+\State add $VelocityFeatureVector$ to list $VelocityFeatureVectors$ \Comment{添加速度特征向量到特征向量列表中}
+\State add $AccelerationFeatureVector$ to list $AcceleratinoFeatureVectors$ \Comment{添加加速度特征向量到特征向量列表中}
+\State $freqIndex \gets freqIndex + 1$
+\EndWhile\label{euclidendwhile}
+\State $VelocityFeatureMatrix \gets$ construct\_feature\_matrix\_from $VelocityFeatureVectors$ \Comment{形状为(8,10)}
+\State $AccelerationFeatureMatrix \gets$ construct\_feature\_matrix\_from $AccelerationFeatureVectors$ \Comment{形状为(8,10)}
+\State \textbf{return} $VelocityFeatureMatrix,AccelerationFeatureMatrix,$\Comment{返回结果}
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 
-\section{基于声波特征的建模技术的研究}
-\section{本章小结}
+到目前为止，结合上文音频设备硬件补偿技术的研究~\ref{sec:audio-research}和基于声波的相位相关信息的感知技术的研究~\ref{sec:sensing-research}，我们可以计算特征矩阵、参考矩阵和距离矩阵。算法~\ref{alg:get-feature-vector}用于计算特征向量。基于算法~\ref{alg:get-feature-matrix},可得出计算特征矩阵的算法。有了特征矩阵之后，可以计算参考矩阵，根据参考矩阵和查询签名的特征矩阵计算距离矩阵。
 
+\section{基于声波特征的建模技术的研究}
+
+\begin{figure}[!htp]
+  \centering
+  \includegraphics[width=\textwidth]{figure/cnn-architecture.pdf}
+  \bicaption
+    {CNN模型架构}
+    {CNN achitecture}
+  \label{fig:cnn-architecture}
+\end{figure}
+
+本文采用深度卷积神经网络作为二分类模型，相比传统机器学习分类器具有更优的分类性能。在距离矩阵经由计算得到后，一个二分类模型被训练用以判断给定的签名是否为真实签名。ASSV使用一个深度卷积神经网络以达到鲁棒的分类效果，该分类模型是一个用户独立的分类模型，当有新用户注册时，不需要重新训练模型。CNN是一种特殊的人工神经网络，旨在处理网格状的数据，它通常包含包含两类操作：卷积操作和池化操作。图~\ref{fig:cnn-architecture}展示了本文设计的CNN模型的概览，下文会详细介绍。
+
+首先，距离矩阵作为一个三维张量喂到第一层卷积层，该卷积层的激活函数是表达式为$max(0,x)$的\textit{RELU}。填充(padding)方式为\textit{SAME},用以保持输入尺寸与输出尺寸一样。第一层卷积层的输出被作为输入，输入到第一层池化层中，用以降采样操作，减小模型容量。池化层的输出作为下一层卷积池化层的输入。值得注意的是，每层卷积层的卷积核大小和数量被经验性地设为3和128。本文采用的池化类型为\textit{max pooling},这是一种最常用的池化操作，池化层的池化大小为2。虽然两重卷积池化层具有相似的配置，但是它们在模型中扮演者不同的角色。第一层卷积层旨在低层的特征信息，而第二层卷积层旨在收集较高层的特征信息。在选择卷积核数量的时候，本文在特征数量和计算开销之间进行了折衷。此外，过多的卷积核更容易导致过拟合。
+
+
+其次，最后一层卷积池化层的输出被铺平成一个向量。为了让CNN模型有更好的收敛速度，我们添加了一个批正规化层(Batch Normalization, BN)~\cite{ioffe2015batch}，它不仅解耦了最后一层卷积池化层，而且保留了数据的表示能力。并且，BN具有正则化的效果，不同小批之间的差异性造成的随机噪声可以增加CNN模型的泛化性能。BN层的输出流入具有8个激活函数为\textit{RELU}的神经元的全连接层。为了进一步增加模型的泛化性能，我们采用了正则化的方法。在ASSV中，我们对核权重矩阵施加了一个$\alpha=0.001$的$L^2$的正则化，对全连接输出层施加了一个$\alpha=0.001$的$L^1$的正则化。此外，全连接层被施加了另外一个正则化技术，dropout~\cite{srivastava2014dropout}，它通过以一定概率丢弃神经元来防止过拟合。在ASSV中，我们经验性设置dropout rate为0.2。
+
+最后，施加了dropout的输出被喂到输出层里，输出层只有一个激活函数为\textit{Sigmoid}的神经元。输出值的取值范围在0到1，代表了查询签名为真实签名的概率。与输出层的结构相对应地，二元交叉熵损失(binary cross entropy loss)被用于训练CNN模型。
+
+\section{本章小结}
+本章是基于声波的签名认证的关键技术研究，我们首先对要解决的问题进行了描述，然后提出一种基于声波的签名认证方案，该方案主要包含四个模块，对应了四种关键技术，我们依次对涉及到的音频设备硬件补偿技术、基于声波的相位相关信息的感知技术、基于声波的相位相关信息的特征提取技术和基于声波特征的建模技术，详细描述了方案中各模块的设计思想和技术细节。
 
 
 \chapter{基于声波的签名认证方案的实验}
@@ -822,8 +855,9 @@ M^{acce} -& C^{acce} \label{eq:distance-6}
 \chapter{总结与展望}
 \section{工作总结}
 \section{研究展望}
-% \section{使用模板}
 
+
+% \section{使用模板}
 % \subsection{准备工作}
 % \label{sec:requirements}
 
