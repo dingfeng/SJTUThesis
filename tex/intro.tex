@@ -693,7 +693,7 @@ X_{k} = \sum_{n=0}^{N-1}x[n] \cdot e^{-j\frac{2\pi kn}{N}} \quad n=0,...,N-1.  \
 
 离散余弦变换与傅里叶变换相关，最初的算法就提出了使用傅里叶变换实现余弦变换，不同的是余弦变换是一种实数变换，不存在系数冗余，详细参考上文~\ref{sec:dct}。DCT的特点是前面系数包含低频信息，后面的系数包含高频信息，可以通过获取前几个系数来获得低频信息，不像离散小波变换需要经过多次变换才能获得所需的信息。因此，本文采用余弦变换用于特征提取和选择。
 
-\subsection{特征矩阵和距离矩阵}
+\subsection{特征矩阵和距离矩阵}  \label{sec:feature-distance-matrix}
 在描述特征提取和选择过程之前，首先介绍两种矩阵：特征矩阵和距离矩阵。对于特征矩阵来说，每个手写签名都具有一个特征矩阵，这个矩阵包含所有我们提取和选择到的特征。对距离矩阵来说，它度量了查询签名和参考签名之间的相似度。我们通常认为，如果一个查询签名和相对应的参考签名具有较高的相似度，那么这个查询签名更有可能是一个真实签名，如果一个查询签名和相对应的参考签名具有较高的不相似度，那么这个查询签名更有可能是一个假签名。
 
 对于每个接收的声波信号序列，因为在发送端有8个频率被使用到，因此可以获得8对 $\Delta Chord$和$Acceleration$序列。先将每个$\Delta Chord$或者$Acceleration$序列正规化到0-1的范围，然后采用DCT来获得信号的频域特征。DCT旨在实现数据的降维，它在信息包装和计算复杂度上有很好的权衡。不相关的DCT系数被产生，其中DCT系数的数量为输入序列的数据点数。前几个DCT系数通常被选取，而通常包含噪声信息的高阶系数通常被删除。结果，每个不同长度的时间序列都可以被转化为固定维度的特征向量。对于每个速度序列和加速度序列，我们经验性地选择前10个DCT系数。
@@ -836,14 +836,297 @@ M^{acce} -& C^{acce} \label{eq:distance-6}
 
 
 \chapter{基于声波的签名认证方案的实验}
+本章将对第三章所提出的基于声波的签名认证方案进行实验验证以及分析。我们首先接受在一定实验配置下的数据采集过程，然后展示众多评估实验和其相应的结果，这些评估实验包括：验证精度、交叉用户可用性、硬件补偿的效果、系统鲁棒性、为基准实验、对比实验和重放攻击。
+
 \section{实验准备}
+我们使用Kotlin语言开发了一个运行在安卓平台上的数据采集应用程序，将其安装在三星Galaxy S6上，使用主扬声器播放生成的WAV格式的音频文件，使用主麦克风接收声波。为了高效地采集数据，接收的声波数据首先保存在智能手机的本地存储空间里，等一个或者多个用户完成试验后，通过局域网传输到电脑上。所有分析过程和生成WAV文件的函数都使用Python语言实现，运行在电脑上用于分析和评估。CNN模型的训练和评估得到一台微星笔记本上的NVIDIA GeForce GTX 860M GPU的加速，这台笔记本还搭载了16GB RAM和一颗Intel Core i7-4710MQ 2.5GHz CPU。此外，我们实现了一个原型系统——ASSV，用Java重写了部分Python代码，该原型系统由两部分组成：(1)一个安卓应用程序(apk大小:38.9 MB)，它执行的任务包括：数据采集、预处理和特征提取；(2)一个运行在服务器上的分类器，它接收来自安卓应用程序的距离矩阵并返回结果。我们对ASSV的运行效率进行了评估。
+
+\begin{figure}
+  \centering
+  \begin{minipage}[t]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/app-ui.pdf}
+      \bicaption{应用程序界面}
+      {App UI}
+        \label{fig:app-ui}
+  \end{minipage}
+  \centering
+  \begin{minipage}[t]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/app-smartphone-setting.pdf}
+    \bicaption
+    {智能手机设置}
+    {Smartphone setting}
+    \label{fig:smartphone-setting}
+   \end{minipage}
+   \begin{minipage}[t]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/app-data-collection.pdf}
+    \bicaption
+    {数据采集}
+    {Data collection}
+    \label{fig:data-collection}
+   \end{minipage}
+\end{figure}
+
+志愿者受邀请到实验里做试验。实验中有正在运行的空调、正在工作的电脑散热器和正在走路或者讲话的研究生。实际上，实验室的环境非常真实，充满噪声，给我们的系统带来了较大挑战。在做任何试验之前，每个志愿者会得到10分钟的训练。首先，志愿者必须熟悉采集程序，并且知道如何使用它。图~\ref{fig:app-ui}展示应用程序的用户界面，它支持的操作包括：开始采集，停止采集，输入保存接收的声波数据的文件名和路径上的两个目录名，删除所有的声音文件，以表格形式列出已经保存的声音文件，显示播放时间等。我们要求志愿者将智能手机放在一张经过精心设计的A4的纸上，该A4纸的每一面上包含28个签名区域。据图~\ref{fig:smartphone-setting}所示，每个签名的区域包含两条线段：一条9毫米长的分隔线段(separation line)和一条38毫米长的写线段(writing line)。分隔线段的一端有一个十字，用于指引我们将智能手机的麦克风放在十字上方，并且它的底部边界与分隔线段和写线段所在的直线重合。在正确放置智能手机之后，我们教志愿者按四个步骤在写线段上签名:(1)右手握住笔，做好准备在写线段上开始写的姿势；(2)使用左手点击\textit{start}按钮；(3)根据手机界面上的时间显示，在1秒钟之后开始写；(4)在书写动作结束之后，使用左手点击\textit{stop}按钮。注意，每写完一个签名，手机界面上的计数器会自增一次，计数器上的数字组成了保存声波数据的文件的文件名。
+
+14个研究生志愿者被邀请参加两阶段的签名试验。这个14位志愿者包含3个女生和11个男生，所有的志愿者习惯使用右手写字。两阶段的签名试验过程如下：
+\begin{enumerate}[label=(\arabic*)]
+    \item 在第一阶段，每个志愿者被邀请书写他/她的签名。每个志愿者会写112个签名，大概耗费30分钟。
+    \item 在第二阶段，我们随机地打乱志愿者的名单以获得一个循环队列。我们向志愿者展示循环队列中，在他/她之后的五个志愿者的签名记录。为了成为一个熟练的模仿者，志愿者必须照着被模仿者的签名记录练习模仿签名，以致于模仿的签名和被模仿者的足够相似，然后为每个选中的被模仿者提供12个模仿签名。
+\end{enumerate}
+总之，每个志愿者有112个真实签名和60个熟练仿造签名。
+
+在学期末的时候，一个班的本科生来一个个和他们的班主任谈话，每人谈话15分钟，我们实验室的导师正好是那个班主任。每个本科生在谈话之后，我们邀请
+他/她帮助我们做签名试验。他们都是习惯使用右手写字，由4个女生和18个男生组成。既然每人的谈话时间是15分钟，为了避免志愿者的等待，我们尽量将每个志愿者的试验时间控制在15分钟以内，他们每个人被要求写32个真实签名和16个熟练模仿签名。后18个本科生中，每人需要模仿他/她的前面4个同学的签名，为每个被模仿者提供4个熟练模仿签名。因此，对于前18个志愿者，他们每人有32个真实签名和16个熟练模仿签名。最后，我们没有使用后4位同学提供的真实签名。由于每次试验的时间限制，这个本科生的数据集比研究生的数据集有较差的质量，但是这个数据集可以用作交叉用户可用性测试。
+
 \section{硬件补偿评估实验}
+
+\begin{figure}
+  \centering
+  \begin{minipage}[t]{0.49\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/nocompensation.pdf}
+      \bicaption{没有硬件补偿时的FFT系数幅度}
+      {FFT coefficient magnitudes w/o compensation}
+        \label{fig:fft-wo-compensation}
+  \end{minipage}
+  \centering
+  \begin{minipage}[t]{0.49\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/compensation.pdf}
+    \bicaption
+    {有硬件补偿时的FFT系数幅度}
+    {Smartphone setting}
+    \label{fig:fft-compensation}
+   \end{minipage}
+\end{figure}
+
+为了评估启发式方法的硬件补偿方法，我们生成了两个WAV格式的音频文件：一个使用了硬件补偿，另外一个没有使用硬件补偿，每个音频文件以48 kHz的频率播放6秒钟。在每种情况中，我们截取第3秒记录的声波数据，对这些数据做FFT，获得48000个输出系数。我们考虑在8个频率上的FFT系数幅度。如图~\ref{fig:fft-wo-compensation}所示，当我们没有使用硬件补偿方法时，最小值、最大值、极差和标准差分别是77.8、323.5、245.7和76.4。相反地，如图~\ref{fig:fft-compensation}所示，当我们使用硬件补偿方法时，最小值、最大值、极差和标准差分别是137.2、164.4、27.1和8.5。很明显，硬件补偿方法大大减少了极差和标准差。进一步，由于过小的幅度导致过小的信噪比，因此该硬件补偿方法通过增加最小值的幅度还可以避免一种情况：在任何一个频率上的信噪比都不至于过小。
+
+
 \section{精度评估实验}
+\label{sec:accuracy-experiment}
+
+就像前人的相关研究~\cite{fischer2015robust,levy2018handwritten}，我们使用两个度量指标在衡量验证准确度：ROC曲线下方的面积AUC和等错误率EER。EER是ROC曲线中FAR(false acceptance rate)和FRR(false rejection rate)相等的点。一个杰出的手写签名认证系统应该具备较高的AUC和较低的EER。在本节评估中，我们使用研究生数据集进行分析和评估。我们报告在熟练仿冒者、随机仿冒者和两者结合这三种情况下的两个度量指标的值。给定一个志愿者，我们通过在其余的志愿者的真实签名集中随机挑选4个签名，来组成该志愿者的随机仿造签名的集合。结果，每个志愿者具有112个真实签名，60个熟练仿造签名和65个随机仿造签名。
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.6\textwidth]{figure/mimic-random-total-ROC-curves.pdf}
+  \bicaption{三种仿造类型的ROC曲线}
+      {ROC curves for the three types of forgers}
+  \label{fig:roc-forgers}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \begin{minipage}[t]{0.49\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/auc-bars.pdf}
+      \bicaption{三种仿造类型的平均AUC值}
+      {Mean AUCs for the three types of forgers}
+        \label{fig:mean-auc-forgers}
+  \end{minipage}
+  \centering
+  \begin{minipage}[t]{0.49\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/eer-bars.pdf}
+    \bicaption
+    {三种仿造类型的平均EER值}
+    {Mean ERRs for the three types of forgers}
+    \label{fig:mean-eer-forgers}
+   \end{minipage}
+\end{figure}
+
+我们洗牌每个研究生的真实签名。前20个真实签名被用作参考签名，它们被用于产生参考矩阵$S_{reference}$(\S\ref{sec:feature-distance-matrix})。接下来的90个签名被用作查询签名，和参考矩阵相结合，用于产生距离矩阵。我们随机地从熟练模仿签名中挑选45个，从随机模仿签名中挑选45个，这样每个研究生志愿者总共有180个签名，包括：90个真实签名、45个熟练模仿签名和45个随机模仿签名。我们将总共拥有$180\times 14=2520$个带标签记录。我们再次将这些记录洗牌，将它们分为两个部分：训练集和测试集。训练集有1764条带标签记录，占总记录数的70\%，而测试有756条带标签记录，占总记录数的30\%。为了绘制ROC曲线，通过改变CNN模型输出值(0到1)的阈值，我们获得一系列的TPR(true positive rate)和相对应的FPR(false positive rate)。给定一个查询签名，它将被判别为真实签名，如果CNN模型的预测值大于选中的阈值，否则，它被判定为仿造签名。图~\ref{fig:roc-forgers}展示了三条ROC曲线，包括：熟练仿造签名情况下的ROC曲线、随机仿造签名情况下的ROC曲线和两种都有的情况下的ROC曲线。为了计算三种情况下的AUC值，我们计算三条ROC曲线下方的面积。为了获得三种情况下的EER值，我们在单元正方形中绘制一条主对角线，从该对角线与ROC曲线的焦点可以获得EER值。
+
+我们将以上过程重复了20次，从而可以求得AUC和EER值的平均值。如图~\ref{fig:mean-auc-forgers}所示，我们得到，在随机仿冒的情况下AUC=0.987，在熟练仿冒的情况下AUC=0.987，在两者结合的情况下AUC=0.987。如图~\ref{fig:mean-eer-forgers}所示，我们得到，在随机仿冒的情况下EER=0.055，在熟练仿冒的情况下EER=0.055，在两者结合的情况下EER=0.055。通常地，因为熟练仿造的签名往往与真实签名在形状上非常相似，所以，当使用扫描图像识别熟练仿造签名的离线签名认证系统会遭受巨大挑战。然而，ASSV在熟练仿造签名识别中表现出了良好的性能。
+
+\section{交叉用户可用性}
+
+\begin{table}[ht]
+  \centering
+    \bicaption{交叉用户可用性 - EER}
+    {Cross-user usability - EER}
+    \label{table:cross-eer}
+    \begin{tabular}{c c c c}
+      \hline\hline 
+      Model & Random(\%) & Skilled(\%) & All(\%) \\ 
+      \hline 
+      No-cross-user & 6.1 & 5.8 & 5.8 \\
+      Cross-user & 14.1 & 19.9 & 17.1 \\
+      Retrained & 4.4 & 9.4 & 7.9 \\
+      \hline 
+    \end{tabular}
+\end{table}
+\begin{table}[ht]
+  \centering
+  \bicaption{交叉用户可用性 - AUC}
+  {Crooss-user usability - AUC} 
+  \label{table:cross-auc} 
+  \begin{tabular}{c c c c} 
+    \hline\hline 
+    Model & Random(\%) & Skilled(\%) & All(\%) \\ 
+    \hline 
+    No-cross-user & 98.3 & 98.5 & 98.4 \\
+    Cross-user & 92.8 & 88.3 & 90.5 \\
+    Retrained & 99.0 & 97.6 & 98.2 \\
+    \hline 
+  \end{tabular}
+\end{table}
+
+在本文中，我们施行关于交叉用户可用性的试验中使用的CNN模型，使用研究生志愿者的数据集作为训练集，使用本科生志愿者的数据集作为测试集。这种类型的试验经常被前面的研究所忽略，他们的测试集和训练集中的用户有重合。我们系统模型被指望是一个用户独立的模型，当有新用户注册的时候，可以不需要额外的高开销的训练过程。所以，施行一个交互用户可用性测试是非常有必要的。在试验中，我们在采用10个参考签名通过重复切分数据集和训练操作，得到20个模型。然后我们建立测试数据集，对于每个测试用户，我们随机挑选10+20个真实签名(10个参考签名和20个真实签名)，10个熟练仿造签名，$2\times 5=10$个随机仿造签名(挑选五个其他用户，每用户提供2个真实签名)。结果，我们拥有$22\times (20+10+10)=880$个距离矩阵用于测试。重复以上生成距离矩阵的集合的过程10次，我们获得10个不同距离矩阵集合。最后，我们实施评估，$20\times 10=200$个AUC和EER对被获得而用于计算平均AUC和EER对。据表格~\ref{table:cross-eer}和表格~\ref{table:cross-auc}所示，相比于非交叉用户评估，交叉用户试验的性能有所下降。但是，系统仍然保持不错的交叉用户可用性。接着，我们将测试模型用作一个预训练模型，测试集中的20\%的数据用于再次训练模型从而获得一个新的模型，这个模型使用剩下的80\%的数据进行测试。我们发现性能得到了很大的提升：第一种情况中，EER达到4.4\%,AUC达到99.0\%;第二种情况中，EER达到9.4\%,AUC达到97.6\%;第三种情况中，EER达到7.9\%，AUC达到98.2\%。
+
 \section{鲁棒性评估实验}
+
+\begin{table}[ht]
+  \centering
+  \bicaption[系统鲁棒性]
+  {系统鲁棒性 - \textbf{RS} 意思是 \textit{reference signatures}(参考签名)}
+  {System robustness - \textbf{RS} means \textit{reference signatures}}
+  \label{table:system-robustness}
+  \begin{tabular}{|c|ccc|ccc|ccc|}
+    \hline
+    \multirow{2}{*}{\textbf{Volunteer}} & \multicolumn{3}{|c|}{\textbf{Environment}} & \multicolumn{3}{|c|}{\textbf{Distance}} & \multicolumn{3}{|c|}{\textbf{Day}} \\
+    \cline{2-10}
+     & \textit{Quiet} & \textit{Music} & \textit{Walk} & \textit{3 cm} &  \textit{6 cm} & \textit{9 cm} & \textit{Day 1} & \textit{Day 2} & \textit{Day 3}\\
+    \hline
+    No. 1 & RS   & 93.3 & 86.1  & \textbf{4.8} & 91.4 & RS &  RS & \textbf{67.1} & 93.4  \\  
+    \hline
+    No. 2 & RS & 81.2 & 93.3  & \textbf{53.3} & 93.6 & RS & RS & 94.0 & 95.4 \\
+    \hline
+    No. 3 & RS & 94.4 & 97.3  & \textbf{57.3} & 89.8 & RS & RS &  94.4 & 96.7 \\
+    \hline
+    No. 4 & RS & 83.2 & 84.8  & \textbf{4.4} & 84.9 & RS & RS &  84.6 & 90.1 \\
+    \hline 
+  \end{tabular}
+\end{table}
+
+为了测试系统的鲁棒性，我们做了三种试验：不同环境下的试验、不同距离下的试验和不同日期下的试验。 我们邀请了4位志愿者参与鲁邦性试验，包括2位男性和2位女性。在每种试验的每种情况下，每个志愿者被要求写下20个他/她的签名。在同一个鲁棒性试验中的所有情况中，我们选择其中一个情况中所得的签名用作参考签名。在这里，我们人工地选择那个用作参考签名的情况。实际上，一个适应算法可以在未来被提出用于为每个用户选择合适的签名，这个超出了本文的研究范围。我们记录分类器的每个输出(0-1)。对于每个查询情况，输出值的中位数规整为0-100的度量值。越高的度量值意味着查询签名和参考签名之间的相似度越高，进一步意味着，系统更具鲁棒性。三种鲁棒性试验的具体情况如下：
+
+\begin{enumerate}[label=(\arabic*)]
+    \item \textbf{不同环境}:每个志愿者被要求在三个不同的环境下进行签名，这个三个环境包括：安静的环境，有播放音乐的环境，有人在旁边行走的环境。在安静的环境中，没有人在房间内说话，也没有人走路；在有播放音乐的环境中，另外一个智能手机放在试验智能手机的旁边播放音乐；在有人在旁边行走的环境中，我们叫一个同学在试验者签名的时候在其旁边行走。
+    \item \textbf{不同距离}:每个志愿者被要求在改变智能手机到签名线的距离时，进行签名。这些距离包括：3cm, 6cm,9cm。
+    \item \textbf{不同日期}:每个志愿者被要求在不同的日期下进行签名。总共有3个不同的日期。
+\end{enumerate}
+
+表格~\ref{table:system-robustness}报告了鲁棒性试验结果。在改变环境或日期的情况下，本文中的系统保持了鲁棒性。然而，当我们将智能手机和签名线之间距离设置为9cm的情况下所得的签名作为参考签名，发现在3cm的情况下所得的签名作为查询签名时效果较差，而在6cm的情况下所得的签名作为查询签名时的效果还算可以，由此可知，当查询签名和参考签名相距为6cm时，系统性能变差。因此，我们建议查询签名和参考签名的距离最好控制在3cm以内。
+
+
 \section{微基准测试}
+ASSV在通过改变一些内部参数的情况下被评估，这些参数包括：参考签名的数量，CNN卷积核的数量，训练集大小，DCT系数数量，声波频率数量和分类器类型。
+
+\subsection{参考签名数量}
+\begin{figure}
+  \centering
+  \includegraphics[width=0.7\textwidth]{figure/rcount-auc-lines.pdf}
+  \bicaption{参考标签数量影响 - AUC}
+      {Reference amount effect - AUC}
+  \label{fig:rcount-auc-lines}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.7\textwidth]{figure/rcount-eer-lines.pdf}
+  \bicaption{参考标签数量影响 - EER}
+      {Reference amount effect - EER}
+  \label{fig:rcount-eer-lines}
+\end{figure}
+
+为了评估在签名认证时，参考签名数量对AUC和EER结果的影响，我们选择在参考签名数量在1到22时测试系统。对于每个选择的参考签名数量，我通过重复实验(参考~\S\ref{sec:accuracy-experiment})来得到平均的AUC和EER。图~\ref{fig:rcount-auc-lines}和图~\ref{fig:rcount-eer-lines}报告了改变参考签名数量的试验结果。总体上，当参考签名数量增加，系统性能变好。当仅仅使用一个参考签名时，AUC=0.984和EER=0.059，当使用6个参考签名时，AUC=0.984 和 EER=0.059，可见，当参考签名从1个增加到6个时，系统性能快速改善。在那之后，随着参考签名数量的增加，系统改善幅度变化不明显，意味着：通过增加参考签名所得到的益处开始收敛。所以，本系统只需要很少的参考签名数量，就能达到良好的性能。结果是，在用户注册阶段，新用户只需要花费较少的时间去写参考签名，这样使得本文的系统更加用户友好。
+
+
+\subsection{CNN卷积核的数量}
+\begin{figure}
+  \centering
+  \includegraphics[width=0.7\textwidth]{figure/filter_number_auc_eer.pdf}
+  \bicaption{CNN卷积核数量的影响}
+      {CNN filter number effect }
+  \label{fig:filter-number-effect}
+\end{figure}
+我们选择20作为参考签名的数量，将CNN卷积核数目设置为 8, 16, 32, 64, 128, 256，在不同的卷积核数量的情况下测试系统性能。图~\ref{fig:filter-number-effect}报告了在第三种情况下(\textit{all forgers})的AUC和EER的结果。当卷积核数量从8增加到128时，系统性能变得更好。当卷积核数量为128时，系统性能达到最佳，结果为：AUC=0.987 和 EER=0.053。即使当卷积核数量为最小的8时，结果仍然可以达到：AUC=0.973 和 EER=0.084，显示出了特征提取的成功之处。 
+
+\subsection{训练集大小}
+\begin{figure}
+  \centering
+  \includegraphics[width=0.7\textwidth]{figure/train_size_auc_eer.pdf}
+  \bicaption{训练集大小的影响}
+      {Train set size effect }
+  \label{fig:train-size-effect}
+\end{figure}
+我们选择20作为参考签名的数量，128作为卷积核数量。为了评估训练集大小对试验结果的影响，我们保持测试集的大小不变，将训练集的大小改变成100,300,...,1700。据图~\ref{fig:train-size-effect}所示，当训练集大小从100增加到1700时，AUC从0.814增加到0.980，EER从0.263增加到0.071。就如预期的那样，当训练集大小增加到一定程度后，AUC和EER的曲线开始收敛。
+
+\subsection{DCT系数数量}
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\textwidth]{figure/dct_total_auc.pdf}
+  \bicaption{DCT系数数量 - AUC}
+      {DCT coefficient number - AUC}
+  \label{fig:dct-total-auc}
+\end{figure}
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\textwidth]{figure/dct_total_eer.pdf}
+  \bicaption{DCT系数数量 - EER}
+      {DCT coefficient number - EER}
+  \label{fig:dct-total-eer}
+\end{figure}
+我们选择20作为参考签名的数量。为了评估DCT系数数量对试验结果的影响，我们将DCT系数数量设置为8, 9, 10, 15, 20, 25, 30, 35, 40。对前面的几个DCT系数数量设置间隔较小，实现较为精细的评估。我们在三种情况下测试DCT系数的数量的影响。第一种情况下，只有相位变化的速度信息被使用；第二种情况下，只有相位变化的加速度信息被使用；第三种情况下，相位变化的速度信息和加速度信息都被使用。假设$C$表示被设置的DCT系数数量。所以，在前两种情况下，距离矩阵的形状为($C$, 8, 3)，而在第三种情况中，距离矩阵的形状为($C$, 8, 6)。图~\ref{fig:dct-total-auc}和图~\ref{fig:dct-total-eer}报告了评估结果。当DCT系数数量是从8到40的时候，只使用相位速度信息的系统性能优于只使用相位加速度信息的系统。总体上，相位的速度信息和加速度信息的结合可以提升系统性能。接着，我们将注意力转移到第三种情况中。如图~\ref{fig:dct-total-auc}所示，当时DCT系数数量为10的时候，系统的性能达到最佳。当DCT系数继续增加的时候，由于噪音的增加，系统性能开始变差。
+
+\subsection{声波频率数量}
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\textwidth]{figure/multi_frequency_auc_eer.pdf}
+  \bicaption{频率数量的影响}
+      {Frequency number effect}
+  \label{fig:frequency-number}
+\end{figure}
+我们选择20作为参考签名的数量。为了评估频率数量对试验结果的影响，我们将频率数量设置为$FN=3, 4,..., 8$。所以，距离矩阵的形状为$(10, FN, 6)$。由于\textit{max pooling}的降维效果，当频率数量小于8的时候，两层卷积池化层将无法工作。因此，为了能够顺利训练和测试模型，我们在原有的CNN模型基础上减去了一层卷积池化层，使用修改后的模型。图~\ref{fig:frequency-number}报告了结果。当频率从3增加到8的时候，AUC从0.977增加到0.984，EER从0.074减少到0.063。所以，多频率的使用可以使得ASSV更加鲁棒和准确。
+
+\subsection{分类器类型}
+\begin{table}[ht]
+  \centering
+  \bicaption
+  {分类器 - AUC}
+  {Classifier - AUC} 
+  \label{table:classifier-auc} 
+  \begin{tabular}{c c c c} 
+      \hline\hline 
+      Classifier & Random(\%) & Skilled(\%) & All(\%) \\ 
+      \hline 
+      Naive Bayes & 86.1 & 83.5 & 84.8 \\
+      SVM & 92.5 & 96.3 & 94.5 \\
+      Random Forest & 93.8 & 93.5 & 93.6 \\
+       \textbf{CNN} &  \textbf{98.3} &  \textbf{98.5} &  \textbf{98.4} \\
+      \hline 
+  \end{tabular}
+\end{table}
+
+
+\begin{table}[ht]
+  \centering
+    \bicaption
+    {分类器 - AUC}
+    {Classifier - AUC} 
+    \label{table:classifier-auc}
+    \begin{tabular}{c c c c}
+      \hline\hline
+      Classifier & Random(\%) & Skilled(\%) & All(\%) \\ 
+      \hline 
+      Naive Bayes & 86.1 & 83.5 & 84.8 \\
+      SVM & 92.5 & 96.3 & 94.5 \\
+      Random Forest & 93.8 & 93.5 & 93.6 \\
+       \textbf{CNN} &  \textbf{98.3} &  \textbf{98.5} &  \textbf{98.4} \\
+      \hline
+    \end{tabular}
+\end{table}
+
+
+
 \section{经典系统对比实验}
 \section{重放攻击实验}
-
+\section{本章小结}
 
 \chapter{基于声波的签名认证方案的系统设计与实现}
 \section{系统需求分析}
