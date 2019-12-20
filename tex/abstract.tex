@@ -10,17 +10,17 @@
 
 手写签名作为一种生物特征，被广泛用于进行生物识别，并且具有相当长的应用历史。它被作为一种文件的授权方式已经有很长时间，因为它包含了个人独特的生物特征。在过去的时候，计算机技术还没普及大众，由于手写签名只需要一张纸和一只笔，使得授权操作变得很方便。在金融、法律、政府领域，手写签名也仍然是一种普遍的授权方式。然而，和人脸、指纹、虹膜、语音这些生物特征类似，手写签名可以被仿造。在银行业，一个仿造的签名能让一个非法的交易成功受理并通过，最后造成一笔巨大的损失。而且，签名仿造不单单发生在银行业，只要有用到手写签名认证的地方，都有可能遭遇仿造攻击，比如遗嘱签名的仿造。 当仿造者拿到真实签名的字迹后，可以花足够的时间去仿造这个签名，以至于仿造签名和真实签名非常相似，这给签名认证带来了巨大的挑战。
 
-随着信息技术的兴起，目前为止很多自动签名认证系统已经被提出并且被应用到工业界中。与脸、虹膜等人体上的物理生物特征不同的是，手写签名会随着个体的身体和心理状态的变成而发生改变。 因此， 一个可行的签名认证系统需要对个体内的差异不敏感，对个体间的差异敏感。根据捕捉签名的方式的不同，现有的系统可以分成两类：离线签名认证系统和在线签名认证系统。离线签名认证系统扫描纸上的静态手写签名并分析，最后得出判别结果。相反，在线签名认证系统利用了笔的速度和压力的时间序列，而不是不是静态数据，执行认证操作。由于额外的时间维度上的信息，在线签名认证比离线签名认证通常可实现更高的精度。
+随着信息技术的兴起，目前为止很多自动签名认证系统已经被提出并且被应用到工业界中。与脸、虹膜等人体上的物理生物特征不同的是，手写签名会随着个体的身体和心理状态的变化而发生改变。 因此， 一个可行的签名认证系统需要对个体内的差异不敏感，对个体间的差异敏感。根据捕捉签名的方式的不同，现有的系统可以分成两类：离线签名认证系统和在线签名认证系统。离线签名认证系统扫描纸上的静态手写签名并分析，最后得出判别结果。相反，在线签名认证系统利用了笔的速度和压力的时间序列，而不是静态数据，执行认证操作。由于额外的时间维度上的信息，在线签名认证比离线签名认证通常可实现更高的精度。
 
-本文实现了一种使用智能手机实现了一个非侵入式的不需要定制设备的手写签名认证系统 --- ASSV。虽然越来越多的用于签名认证的平板得到普及，但是一张纸盒一张笔用于签名依然非常常见。 相比于使用惯性传感器 (基于腕表)，声波可以获得更细粒度的手的运动信息。声波信号普及率高，普通的智能手机便可发射和接收声波，可用于普世计算，近些年得到了众多研究者的关注。 本系统面向于这样的一个场景，用户使用普通的笔在普通的纸上签名，同时放在一旁的智能手机发射和接收人耳不可听的声波跟踪手的运动。
+本文实现了一种使用智能手机实现了一个非侵入式的不需要定制设备的手写签名认证系统 --- ASSV。虽然越来越多的用于签名认证的平板得到普及，但是一张纸和一张笔用于签名依然非常常见。 相比于使用惯性传感器 (基于腕表)，声波可以获得更细粒度的手的运动信息。声波信号普及率高，普通的智能手机便可发射和接收声波，可用于普适计算，近些年得到了众多研究者的关注。 本系统面向这样的一个场景，用户使用普通的笔在普通的纸上签名，同时放在一旁的智能手机发射和接收人耳不可听的声波跟踪手的运动。
 将声波应用到在线签名认证的过程中，本文主要做了以下几个方面的研究工作：
 
 \begin{enumerate}[label=(\arabic*)]
-    \item 据本文所知，这是第一个用智能手机发射和接收声波实现在线签名认证的系统。 本文实现了一个同时播放经过特定调制过的声波信号和接收声波信号的安卓应用，并在智能手机上高校执行预处理和特征提取的处理过程。 整个系统和用户低延迟交互。
+    \item 据本文所知，这是第一个用智能手机发射和接收声波实现在线签名认证的系统。 本文实现了一个同时播放经过特定调制过的声波信号和接收声波信号的安卓应用，并在智能手机上高效执行预处理和特征提取的处理过程。 整个系统和用户低延迟交互。
     
     \item 使用声波的相位相关信息跟踪用户行为得到进一步研究。 本文提出了一种基于弦的方法去估计相位相关的信息，同时解决了直流问题。 使用数学方法证明该方法的可行性，以一种易于理解的方式呈现细节推理部分。 设计了特征提取和判别方法。
     
-    \item 本文全面评估了ASSV系统。据结果显示，ASSV可以达到98.7\% 的 AUC (Area Under Curve) 和 5.5\%的 EER (Equal Error Rate), 且具有较低的延迟。 ASSV在交叉用户验证中也显示出了较好的性能。 当改变环境、时间、位置的情况，ASSV表现出良好的鲁棒性。更进一步，ASSV的安全性本文使用了重放攻击进行了测试。
+    \item 本文全面评估了ASSV系统。据结果显示，ASSV可以达到98.7\% 的 AUC (Area Under Curve) 和 5.5\%的 EER (Equal Error Rate), 且具有较低的延迟。 ASSV在交叉用户验证中也显示出了较好的性能。 当改变环境、时间、位置的情况，ASSV表现出良好的鲁棒性。更进一步，本文使用了重放攻击对ASSV的安全性进行了测试。
 \end{enumerate}
 
 
@@ -30,8 +30,7 @@
 As one kind of biological characteristics of people, handwritten signature has a long history of being used for biological identification. Handwritten signature has been regarded as one of main means of demonstrating the authenticity for paper-based
 documents for a very long time because it contains the unique biological characteristics of an individual. In the past, handwritten signatures make authentication much easy as they only require a pen together with paper. Due to this, handwritten signature verification is commonly accepted as an authentication method in financial, legal, and administrative areas. However, similar to other biometric characteristics such as a face, fingerprint, iris and voice, handwritten signatures are also meeting the challenge of forgery. In the banking industry, a forged handwritten signature of payment can make the bank approve an illegal deal, which causes a large amount of loss. Moreover, such cases do not only occur in the financial area. Testamentary fraud is a new phenomenon, and forgery of signatures on a will brings the criminals a large amount of money. It is difficult for a person to recognize whether a signature is forged when the skilled forger has practiced forging this signature for a while.
 
-With the rising of information technology, many handwritten signature verification systems up to now have been proposed and being used in the industry. Unlike the physiological characteristics (face, iris, etc.), signatures written in a period of time is affected by
-the physical and emotional conditions of a subject. Therefore, a signature verification system is thought to be feasible only if the system is insensitive to intra-personal variability but sensitive to inter-personal variability.Existing systems can be categorized into two groups in terms of the method used to capture the signatures: off-line and on-line. In off-line verification, the static shapes of signatures are scanned and further analyzed. In contrast, on-line systems utilize the time series of speed and pressure of pens instead of static data to perform verification. Due to the additional temporal information, on-line approaches can achieve higher accuracy than off-line approaches.
+With the rising of information technology, many handwritten signature verification systems up to now have been proposed and being used in the industry. Unlike the physiological characteristics (face, iris, etc.), signatures written in a period of time is affected by the physical and emotional conditions of a subject. Therefore, a signature verification system is thought to be feasible only if the system is insensitive to intra-personal variability but sensitive to inter-personal variability. Existing systems can be categorized into two groups in terms of the method used to capture the signatures: off-line and on-line. In off-line verification, the static shapes of signatures are scanned and further analyzed. In contrast, on-line systems utilize the time series of speed and pressure of pens instead of static data to perform verification. Due to the additional temporal information, on-line approaches can achieve higher accuracy than off-line approaches.
 
 This paper implements a non-intrusive handwritten signature verification system using a smartphone without special devices, ASSV. Although more and more digitizer devices have been employed, a pen together with paper is still common nowadays. Instead of inertial sensors, acoustic signals are exploited to get more fine-grained movement information of the hand non-intrusively. In addition, the applications of acoustic signals from smartphones have been researched in recent years. Hence, the system targets at the scenario where a user writes his signature on the normal paper with a normal pen while a smartphone transmitting and receiving inaudible acoustic signals is put aside to record the signal changes caused by the movements of both the hand and the pen. The main contributions of this paper are summarized as follows: 
 \begin{enumerate}[label=(\arabic*)]
