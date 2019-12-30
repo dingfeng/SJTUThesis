@@ -2,7 +2,6 @@
 %==================================================
 %% sjtuthesis.cls for SJTU Master Thesis
 %%==================================================
-
 \NeedsTeXFormat{LaTeX2e}[1995/12/01]
 \ProvidesClass{sjtuthesis}[2018/01/09 v0.10 Shanghai Jiao Tong University Template]
 \def\version{v0.10}

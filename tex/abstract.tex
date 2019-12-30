@@ -8,14 +8,14 @@
 
 \begin{abstract}
 
-随着音频设备在生活中的普及，近年来基于声波感知技术的应用得到不断研究，智能手机或者电脑笔记本上的音频设备（麦克风和扬声器）从简单的录制和播放音乐的应用，发展到用于手势识别和测距，声波感知已经成为一种具有普适性的感知手段。目前的商用音频设备，可以发射人耳不可听到的声波，用于实现无声的人机交互。图像识别是当前流行的感知技术，而无线感知技术包括超高频射频识别技术（Ultra High Frequency Radio Frequency Identification，简称RFID）、WiFi感知技术、声波感知技术等，具有处理效率高、无需可见光、隐私不敏感等优势。相比其他无线感知技术，声波感知技术具有更高的灵活性和搞干扰能力，可对物体实现更细粒度的跟踪，具有较大应用前景，而本文提出一种基于声波的签名认证技术。当前常用手写签名认证方案有基于惯性传感器、基于扫描图像、基于手写平板设备的解决方案三种，而本文的方案能够利用主流智能手机上的商用音频设备实现手写签名的真实性判别，是对现有手写签名认证手段的有效补充，充分发挥声波感知技术的优势，具有重要的研究价值和现实意义。
+随着音频设备在生活中的普及，近年来基于声波感知技术的应用得到不断研究，智能手机或者电脑笔记本上的音频设备（麦克风和扬声器）从简单的录制和播放音乐的应用，发展到用于手势识别和测距，声波感知已经成为一种具有普适性的感知手段。目前的商用音频设备，可以发射人耳不可听到的声波，用于实现无声的人机交互。图像识别是当前流行的感知技术，而无线感知技术包括超高频射频识别技术、WiFi感知技术、声波感知技术等，具有处理效率高、无需可见光、隐私不敏感等优势。相比其他无线感知技术，声波感知技术具有更高的灵活性和搞干扰能力，可对物体实现更细粒度的跟踪，具有较大应用前景，而本文提出一种基于声波的签名认证技术。当前常用手写签名认证方案有基于惯性传感器、基于扫描图像、基于手写平板设备的解决方案三种，而本文的方案能够利用主流智能手机上的商用音频设备实现手写签名的真实性判别，是对现有手写签名认证手段的有效补充，充分发挥声波感知技术的优势，具有重要的研究价值和现实意义。
 
 本文在充分研究了声波感知技术和手写签名认证技术的基础上，将两种技术相结合，提出了一套基于声波的手写签名认证技术，该方案致力于研究无需定制设备的情况下，仅仅利用主流智能手机上的音频设备对用户的手写签名进行判别真伪。
 
 本文结合声波感知的基本原理和商用音频设备的特点设计了用户友好、可抗干扰的声波发射信号，并通过对经手和笔反射的声波信号的分析，提取到与距离变化相关的声波相位信息，然后参考传统的签名认证技术，提取与手部运动相关的频域特征，再根据一般的签名认证系统的框架，对所获特征进行分类。详细研究了该方案中涉及到各项技术，包括音频设备硬件补偿技术、基于声波的相位相关信息的感知技术、基于声波的相位相关信息的特征提取技术、基于声波特征的建模技术。
 
 
-针对提出的基于声波的手写签名认证方案，本文设计了一些实验来验证该方案签名认证的精度以及分析系统性能的影响因素。实验结果表明，该手写签名认证方案的AUC（ROC曲线下方面积）和EER（等错误率）可达到98.7\%和5.5\%，并且模型具有良好交叉用户可用性，对环境噪声和用户状态变化具有拥有良好的容忍能力，可抵抗简单的重放攻击。为了检验该手写签名认证方案的可行性和实用性，本文利用三星Galaxy S6智能手机和一台普通个人电脑设计和实现了手写签名认证系统，并对系统中涉及的各个模块进行了详细的描述。
+针对提出的基于声波的手写签名认证方案，本文设计实验来评估该签名认证方案的精度和性能的影响因素。实验结果表明，此手写签名认证方案的AUC（ROC曲线下方面积）和EER（等错误率）可达到98.7\%和5.5\%，并且模型具有良好交叉用户可用性，对环境噪声和用户状态变化具有拥有良好的容忍能力，可抵抗简单的重放攻击。为了检验该手写签名认证方案的可行性和实用性，本文利用三星Galaxy S6智能手机和一台普通个人电脑设计和实现了手写签名认证系统，并对系统中涉及的各个模块进行了详细的描述。
 
 \end{abstract}
 \begin{englishabstract}
@@ -26,7 +26,7 @@ Based on the full research of acoustic-based sensing technology and handwritten 
 
 This article combines the basic principles of acoustic-based sensing and the characteristics of commercial audio equipment to design a user-friendly, interference-resistant sound wave emission signal. By analyzing the sound wave signal reflected by the hand and pen, it is extracted to correlate with the change in distance acoustic phase information, and then refer to the traditional signature authentication technology to extract the frequency domain features related to hand movements, and then classify the obtained features according to the framework of a general signature authentication system. Various technologies involved in this solution are studied in detail, including audio equipment hardware compensation technology, sound wave-based phase-related information sensing technology, acoustic-based phase-related information feature extraction technology, and sound wave feature-based modeling technology.
 
-Aiming at the proposed sonic-based handwritten signature verification scheme, this paper designs some experiments to verify the accuracy of the scheme's signature authentication and analyze the influencing factors of system performance. The experimental results show that the AUC (area under the ROC curve) and EER (equivalent error rate) of the handwritten signature authentication scheme can reach 98.7\% and 5.5\%, and the model has good cross-user usability, and has good effects on environmental noise and user status changes. Tolerant ability to resist simple replay attacks. In order to test the feasibility and practicability of the handwritten signature authentication scheme, this article uses Samsung Galaxy S6 smartphone and an ordinary personal computer to design and implement a handwritten signature authentication system, and describes each module involved in the system in detail.
+Aiming at the proposed sonic-based handwritten signature verification scheme, this paper designs some experiments to evaluate the accuracy of the scheme's signature authentication and analyze the influencing factors of system performance. The experimental results show that the AUC (area under the ROC curve) and EER (equivalent error rate) of the handwritten signature authentication scheme can reach 98.7\% and 5.5\%, and the model has good cross-user usability, and has good effects on environmental noise and user status changes. Tolerant ability to resist simple replay attacks. In order to test the feasibility and practicability of the handwritten signature authentication scheme, this article uses Samsung Galaxy S6 smartphone and an ordinary personal computer to design and implement a handwritten signature authentication system, and describes each module involved in the system in detail.
 
 \end{englishabstract}
 
