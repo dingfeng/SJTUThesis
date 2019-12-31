@@ -14,7 +14,7 @@
 随着信息技术的兴起和广泛应用，许多应用需要用户首先进行登录操作，这其实就是身份识别方式，只有通过了身份认证的用户才会被系统认为是授权用户。用户的身份认证方式可以为分为三种~\cite{Huang2011A}，如图~\ref{fig:identification-method}所示：
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=0.7\textwidth]{figure/identification-method.pdf}
+  \includegraphics[width=0.5\textwidth]{figure/identification-method.pdf}
   \bicaption
     {身份认证方式}
     {Identification methods}
@@ -84,11 +84,12 @@
 
 (2) 手写签名认证模型的研究
 
-针对声波相位相关信息设计了合适的特征提取和用户独立的识别模型。手写签名动作所产生的影响在相位信号中体现为低频信号，而高频信号则是由环境或者硬件造成的噪声所产生，因此可以通过将时域数据转换到频域数据，然后提取低频系数的方法，将手写签名动作的信息提取出来。当判别一个查询签名是否为真的时候，需要比较查询签名的特征与模板签名特征的之间的相似度，本文对多个模板签名的特征进行融合操作，获得几个固定数目的特征矩阵，查询签名的特征矩阵和这些矩阵作差获得相似矩阵。最后采用比传统分类器有更好表现的深度神经网络 (Deep Neural Network, DNN)\cite{Schmidhuber2015Deep} 作为二分类器来分类相似矩阵。
+针对声波相位相关信息设计了合适的特征提取和用户独立的识别模型。手写签名动作所产生的影响在相位信号中体现为低频信号，而高频信号则是由环境或者硬件造成的噪声所产生，因此通过将时域数据转换到频域数据，然后提取低频系数的方法，将手写签名动作的信息提取出来。当判别一个查询签名是否为真的时候，需要比较查询签名的特征与模板签名特征的之间的相似度，本文对多个模板签名的特征进行融合操作，获得几个固定数目的特征矩阵，查询签名的特征矩阵和这些矩阵作差获得相似矩阵。最后采用比传统分类器有更好表现的深度神经网络 (Deep Neural Network, DNN)\cite{Schmidhuber2015Deep} 作为二分类器来分类相似矩阵。
 
-(3) 系统实现和性能评估分析
+(3) 性能评估分析和原型系统实现
 
-本文利用三星Galaxy S6智能手机设计并实现基于声波的手写签名认证系统，并且对其进行了全面的评估，包括准确性的度量、鲁棒性测试、安全性测试、微基准测试、性能测试等。准确性测试以 AUC (Area Under Curve) 和 EER (Equal Error Rate) 作为度量指标；在鲁棒性测试中，改变环境、距离、日期等来对系统进行测试；在安全性测试中，测试系统对重放攻击的抵抗能力；在微基准测试中，改变一些超参数观察系统的变化；在性能测试中，通过度量系统时延。
+对该方案进行了全面的评估，包括验证精度、交叉用户可用性、硬件补偿的效果、系统鲁棒性、微基准实
+验、对比实验和重放攻击等。准确性测试以 AUC (Area Under Curve) 和 EER (Equal Error Rate) 作为度量指标；在鲁棒性测试中，改变环境、距离、日期等来对系统进行测试；在安全性测试中，测试系统对重放攻击的抵抗能力；在微基准测试中，改变一些超参数观察系统的变化；在性能测试中，通过度量系统时延。利用三星Galaxy S6智能手机设计并实现基于声波的手写签名认证原型系统，对其运行效率进行了评估。
 
 
 \subsection{研究创新点}
@@ -103,7 +104,7 @@
 
 本文共分五章，每章的内容安排如下：
 
-第一章为绪论，主要阐述了手写签名认证研究的背景意义、国内外相关技术研究现状、本文的研究内容以及主要的创新点。
+第一章为绪论，主要阐述了手写签名认证研究的背景和研究意义、国内外相关技术研究现状、本文的研究内容以及主要的创新点。
 
 第二章是手写签名认证相关技术的分析，首先分别从手写签名认证中的感知技术和手写签名认证中的建模方法两个方面对现有的研究进行了综述，然后分析总结了现有研究存在的问题。基于存在的问题，提出了本文的技术路线，最后介绍了本文涉及到的相关理论和技术。
 
@@ -127,7 +128,7 @@
 \begin{table}[!hpb]
   \centering
   \bicaption
-    {真实签名与仿造签名图像}
+    {真实签名与仿造签名图像~\cite{Hanmandlu2005Off}}
     {Genuine and forged signatures}
   \label{tab:signatures-images}
   \begin{tabular}{|c|m{0.2\textwidth}|m{0.2\textwidth}|m{0.2\textwidth}|} \toprule 
@@ -150,7 +151,7 @@ Alona~\cite{Levy2018Handwritten}等人提出一种可穿戴的手写签名认证
 它使用一个戴在签名手上的智能腕表上的惯性传感器和加速度计实现对签名动作的记录，虽然腕表目前的普及率还远不如智能手机，但腕表逐渐被大众所接受，所以这种方法还是具有普适性的。Isaac\cite{8698222}等人使用腕表实现了在多个场景下的手写身份识别，并对多种不同强度的攻击方式进行评估。Bunke~\cite{Bunke2015Online}等人在普通笔的笔尖附近贴上了一个带线的加速度计，使用如图~\ref{fig:pen-inertial-sensor}所示，通过细带电缆将加速度时间序列传输到电脑端，据此分析签名动作。
 \begin{figure}[!htp]
   \centering
-  \begin{minipage}[t]{0.3\textwidth}
+  \begin{minipage}[t]{0.22\textwidth}
     \centering
     \includegraphics[width=\textwidth]{figure/smartwatch.pdf}
       \bicaption{用腕表上惯性传感器}
@@ -174,7 +175,7 @@ Alona~\cite{Levy2018Handwritten}等人提出一种可穿戴的手写签名认证
 如图~\ref{fig:signing-tablet}所示，
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=0.5\textwidth]{figure/tablet.png}
+  \includegraphics[width=0.3\textwidth]{figure/tablet.png}
   \bicaption
     {在平板上签名}
     {Signing on a tablet}
@@ -224,7 +225,7 @@ DTW是一种非常经典用于计算两个不同长度序列之间距离的算�
 本文针对目前手写签名认证中的感知技术和手写签名认证中的建模方法的研究中存在的问题，提出了本文的技术路线，如图~\ref{fig:technology-roadmap}所示，主要是具有递进关系的四种技术研究，下面将分别介绍这四种技术。
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=0.4\textwidth]{figure/technique-road.pdf}
+  \includegraphics[width=0.3\textwidth]{figure/technique-road.pdf}
   \bicaption
     {本文的技术路线}
     {The technology roadmap}
@@ -254,7 +255,7 @@ DTW是一种非常经典用于计算两个不同长度序列之间距离的算�
 三星Galaxy S6是三星公司在2015年5月推出的一款智能手机，是本文原型系统ASSV使用的智能手机，如图~\ref{fig:audio-device-smartphone}所示。
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=0.7\textwidth]{figure/smartphone.pdf}
+  \includegraphics[width=0.5\textwidth]{figure/smartphone.pdf}
   \bicaption
     {智能手机上的音频设备}
     {Audio devices on smartphones}
@@ -301,7 +302,7 @@ DTW是一种非常经典用于计算两个不同长度序列之间距离的算�
 将智能手机上麦克风的采样率设置为48 kHz，由于接收和发射声波的设备在同一智能手机共享一个时钟频率，因此接收端和发送端之间不存在载频偏移(Carrier Frequency Offset, CFO)。因此，可使用图~\ref{fig:sound-signal-down-conversion}
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=0.7\textwidth]{figure/down-conversion.pdf}
+  \includegraphics[width=0.5\textwidth]{figure/down-conversion.pdf}
   \bicaption
     {声波信号下转化}
     {Sound signal down conversion}
@@ -365,7 +366,7 @@ CNN~\cite{goodfellow2016deep}是一种用于处理网格状数据的特殊ANN，
 其中，$I$、$K$、$S$分别是输入图像、卷积核和特征图，图~\ref{fig:convolution-process}
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=0.6\textwidth]{figure/convolution-process.pdf}
+  \includegraphics[width=0.4\textwidth]{figure/convolution-process.pdf}
   \bicaption
     {卷积过程}
     {Convolution process}
@@ -393,7 +394,7 @@ CNN~\cite{goodfellow2016deep}是一种用于处理网格状数据的特殊ANN，
 本文的签名认证方案可以作为一种需要和其他认证方案相结合的辅助认证方案，例如可以和现有的离线签证认证系统或者人工签名认证相结合，最终的系统利用多模的优势提高签名认证的精度。如图~\ref{fig:sign-senario}
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=0.6\textwidth]{figure/acoustic-senario.pdf}
+  \includegraphics[width=0.4\textwidth]{figure/acoustic-senario.pdf}
   \bicaption
     {签名场景}
     {Senario of signing}
@@ -405,7 +406,7 @@ CNN~\cite{goodfellow2016deep}是一种用于处理网格状数据的特殊ANN，
 在两个场景中，默认参考签名已经预先被系统记录下。场景二是本文系统所适用的场景，签名者来的操作包括：获取支票、寻找签名区域、拿笔准备写、开启声波跟踪、开始手写、结束手写、结束声波跟踪、获得验证结果，如图~\ref{fig:signing-steps}所示。智能手机可以在场景中使用声波跟踪签名过程中手和笔的运动模式。然而使用智能手机收发声波跟踪手和笔运动实现在线认证的方案仍然面临着诸多挑战：首先，个人的签名仍然可以被观察和练习，这是目前所有签名认证系统所面临和需要克服的挑战；另外，声波可以被其他恶意的音频接收设备所接收，之后再播放出来实行重放攻击。
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=0.6\textwidth]{figure/senario-actions}
+  \includegraphics[width=0.5\textwidth]{figure/senario-actions}
   \bicaption
     {场景二签名步骤}
     {Signing steps in Senario 2}
@@ -416,7 +417,7 @@ CNN~\cite{goodfellow2016deep}是一种用于处理网格状数据的特殊ANN，
 针对上述问题，本文设计提出了一种基于声波的签名认证方案，如图~\ref{fig:acoustic-hsv-method}所示。该方案主要将声波感知技术引入到手写签名认证的研究中，包含四个关键步骤：声波收发、声波相位相关信息采集、特征提取、分类模型。
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=\textwidth]{figure/system-architecture.pdf}
+  \includegraphics[width=0.6\textwidth]{figure/system-architecture.pdf}
   \bicaption
     {基于声波的手写签名认证方案}
     {Acoustic-based handwritten signature verification method}
@@ -601,7 +602,7 @@ c.残差序列。残差序列是一个这样的一个序列，为了满足相加
 图~\ref{fig:trend-seasonal-decomposition-effect}展示分解效果，
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=0.9\textwidth]{figure/std-effect.pdf}
+  \includegraphics[width=0.5\textwidth]{figure/std-effect.pdf}
   \bicaption
     {趋势季节分解效果}
     {Trend-Seasonal Decomposition Effect}
@@ -619,7 +620,7 @@ c.残差序列。残差序列是一个这样的一个序列，为了满足相加
 如图~\ref{fig:large-magnitude-movements}所示，对于每个方向上都有大幅度移动的运动模式，这种运动模式会造成相位在同一个方向(顺时针方向)上运动较长时间，在这种情况下$x_0$和$y_0$通过分别计算同相分量和正交分量的平均值而得到。
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=0.7\textwidth]{figure/large-magnitude-movement.pdf}
+  \includegraphics[width=0.5\textwidth]{figure/large-magnitude-movement.pdf}
   \bicaption
     {大幅度运动}
     {Large-magnitude movements}
@@ -629,7 +630,7 @@ c.残差序列。残差序列是一个这样的一个序列，为了满足相加
 如图~\ref{fig:medium-magnitude-movements}所示，对于每个方向上都有中等幅度移动的运动模式，相位变化的方向变化较快，以致于同相分量和正交分量不是均匀分布，而是集中在\textit{Area 1}，但是同相分量和正交分量的最小值和最大值还是达到了，对于这种情况，第一种情况中所使用的方法不再适用，但是仅仅依赖于最小值和最大值的方法LEVD~\cite{wang2016device}仍然可以工作得很好。
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=0.7\textwidth]{figure/medium-magnitude-movement.pdf}
+  \includegraphics[width=0.5\textwidth]{figure/medium-magnitude-movement.pdf}
   \bicaption
     {中等幅度运动}
     {Medium magnitude movements}
@@ -639,7 +640,7 @@ c.残差序列。残差序列是一个这样的一个序列，为了满足相加
 如图~\ref{fig:small-magnitude-movements}所示，对于每个方向上的移动都是比较小的运动，相位的改变方向过于频繁，这种情况是手写运动中相位变化最常见的一种模式，在之前情况中所使用的方法将不适用，在这种情况下计算$x_{0}$和$y_{0}$变得很有挑战性。
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=0.7\textwidth]{figure/small-magnitude-movement.pdf}
+  \includegraphics[width=0.5\textwidth]{figure/small-magnitude-movement.pdf}
   \bicaption
     {小幅度运动}
     {Small magnitude movements}
@@ -651,7 +652,7 @@ c.残差序列。残差序列是一个这样的一个序列，为了满足相加
 假设$Q[t]$和$I[t]$分别是正交分量和同相分量序列，其中$t=1,2,3,...,n$。图~\ref{fig:discrete-point-trace}展示
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=0.7\textwidth]{figure/estimation-geometry.pdf}
+  \includegraphics[width=0.5\textwidth]{figure/estimation-geometry.pdf}
   \bicaption
     {I/Q估计的上离散点}
     {Discrete points on the I/Q trace}
@@ -720,7 +721,7 @@ W_{\psi}[j,k] =& \frac{1}{\sqrt{M}}\sum_{n}f[n]\psi_{j,k}[n],  j \geq j_{0}. \la
 式~\ref{eq:approximation-efficients}是近似系数，而式~\ref{eq:detailed-efficients}是细节系数。近似系数中包含低频信息，而细节系数包含高频信息，如图~\ref{fig:dwt}所示，原始信号经过小波变换可以得到近似系数和细节系数，而对近似系数和细节系数不断进行小波变换，从而得到想要的那段频率范围内的信息。
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=0.7\textwidth]{figure/dwt.pdf}
+  \includegraphics[width=0.5\textwidth]{figure/dwt.pdf}
   \bicaption
     {小波变换}
     {Discrete wavelet transform}
@@ -798,67 +799,8 @@ M^{acce} -& C^{acce} \label{eq:distance-6}
 总而言之，特征矩阵用于进一步产生距离矩阵，而距离矩阵则被作为分类模型的输入。
 
 \subsection{算法}
-到目前为止，结合上文音频设备硬件补偿技术的研究~\ref{sec:audio-research}和基于声波的相位相关信息的感知技术的研究~\ref{sec:sensing-research}，计算特征矩阵、参考矩阵和距离矩阵。算法~\ref{alg:get-feature-vector}用于计算特征向量。
-\begin{algorithm}
-\caption{获得特征向量}
-\label{alg:get-feature-vector}
-\begin{algorithmic}[1]
-\Procedure{GET\_FEATURE\_VECTOR}{$data,f,dctNum$}\Comment{data是接收到的离散声波信号,f是声波频率,dctNum为dct索取系数数量}
-\State $FreqRate \gets 48000$           \Comment{采样率为48 kHz}
-\State $I \gets [], Q \gets []$  \Comment{初始化I-component和Q-component}
-\State $dataLen \gets$ getLengthof $data$  \Comment{获得data的数据点数量}
-\State $i \gets 0$
-\While{$i < dataLen$} \Comment{遍历数据点}
-\State $I[i]=data[i]*cos(\frac{2\pi fi}{FreqRate})$
-\State $Q[i]=data[i]*(-sin(\frac{2\pi fi}{FreqRate}))$
-\State $i \gets i + 1$
-\EndWhile\label{euclidendwhile}
-\State $I \gets $ DownSample $\gets $ LowPassFilter $I$   \Comment{获得I-component}
-\State $Q \gets $ DownSample $\gets $ LowPassFilter $Q$   \Comment{获得Q-component}
-\State $I\_seasonal,I\_trend,I\_resid \gets$ seasonal decompose $I$      \Comment{趋势季节分解}
-\State $Q\_seasonal,Q\_trend,Q\_resid \gets$ seasonal decompose $Q$  
-\State $j \gets 1$
-\State $\Delta Chord \gets []$
-\While{$j < getLengthOf(I\_trend)$} \Comment{遍历数据点}
-\State $\Delta Chord[j-1] \gets \sqrt{(I[j]-I[j-1])^{2} + (Q[j]-Q[j-1])^{2}}$
-\State $j \gets j + 1$
-\EndWhile\label{euclidendwhile}
-\State $k \gets 1$
-\State $Acceleration \gets []$
-\While{$k < getLengthOf(\Delta Chord)-1$} \Comment{遍历数据点}
-\State $Acceleration[k-1] \gets \frac{(\Delta Chord[k+1] - \Delta Chord[k]) + (\Delta Chord[k+1] - \Delta Chord[k])/2}{2}$
-\State $k \gets k + 1$
-\EndWhile\label{euclidendwhile}
-\State $VelocityFeatureVector \gets dct(\Delta Chord)[:dctNum]$
-\State $AccelerationFeatureVector \gets dct(Acceleration)[:dctNum]$
-\State \textbf{return} $VelocityFeatureVector,AccelerationFeatureVector$\Comment{返回结果}
-\EndProcedure
-\end{algorithmic}
-\end{algorithm}
-基于算法~\ref{alg:get-feature-matrix},
-\begin{algorithm}[!htp]
-\caption{获得特征矩阵}
-\label{alg:get-feature-matrix}
-\begin{algorithmic}[1]
-\Procedure{GET\_FEATURE\_MATRIX}{$data$} \Comment{data是接收到的离散声波信号}
-\State $BaseFrequency \gets 17350, FreqNum \gets 8, dctNum \gets 10$ \Comment{初始化起始频率、频率数目和DCT系数数目}
-
-\State $VelocityFeatureVectors \gets []$  \Comment{初始化速度特征向量列表}
-\State $AcceleratinoFeatureVectors \gets []$ \Comment{初始化加速度特征向量列表}
-\State $freqIndex \gets 0$ 
-\While{$freqIndex < FreqNum$} \Comment{遍历数据点}
-\State $freq \gets BaseFrequency + freqIndex\times 700$
-\State $VelocityFeatureVector,AccelerationFeatureVector \gets  GET\_FEATURE\_VECTOR(data, freq, dctNum)$
-\State add $VelocityFeatureVector$ to list $VelocityFeatureVectors$ \Comment{添加速度特征向量到特征向量列表中}
-\State add $AccelerationFeatureVector$ to list $AcceleratinoFeatureVectors$ \Comment{添加加速度特征向量到特征向量列表中}
-\State $freqIndex \gets freqIndex + 1$
-\EndWhile\label{euclidendwhile}
-\State $VelocityFeatureMatrix \gets$ construct\_feature\_matrix\_from $VelocityFeatureVectors$ \Comment{形状为(8,10)}
-\State $AccelerationFeatureMatrix \gets$ construct\_feature\_matrix\_from $AccelerationFeatureVectors$ \Comment{形状为(8,10)}
-\State \textbf{return} $VelocityFeatureMatrix,AccelerationFeatureMatrix,$\Comment{返回结果}
-\EndProcedure
-\end{algorithmic}
-\end{algorithm}
+到目前为止，结合上文音频设备硬件补偿技术的研究~\ref{sec:audio-research}和基于声波的相位相关信息的感知技术的研究~\ref{sec:sensing-research}，计算特征矩阵、参考矩阵和距离矩阵。算法~\ref{alg:get-feature-vector}（参见附录）用于计算特征向量。
+基于算法~\ref{alg:get-feature-matrix}（参见附录）,
 可得出计算特征矩阵的算法。有了特征矩阵之后，可以计算参考矩阵，根据参考矩阵和查询签名的特征矩阵计算距离矩阵。
 
 \section{基于声波特征的建模技术研究}
@@ -967,7 +909,7 @@ M^{acce} -& C^{acce} \label{eq:distance-6}
 打乱每个研究生的真实签名，前20个真实签名被用作参考签名，它们被用于产生参考矩阵$S_{reference}$(\S\ref{sec:feature-distance-matrix})，接下来的90个签名被用作查询签名，和参考矩阵相结合，用于产生距离矩阵。随机地从熟练模仿签名中挑选45个，从随机模仿签名中挑选45个，这样每名研究生志愿者总共有180个签名，包括：90个真实签名、45个熟练模仿签名和45个随机模仿签名，将总共拥有$180\times 14=2520$个带标签记录。再次将这些记录打乱，将它们分为：训练集和测试集两个部分，训练集有1764条带标签记录，占总记录数的70\%，测试集有756条带标签记录，占总记录数的30\%。为了绘制ROC曲线，通过改变CNN模型输出值(0到1)的阈值，获得一系列的TPR(true positive rate)和相对应的FPR(false positive rate)。给定一个查询签名，如果CNN模型的预测值大于选中的阈值，它将被判别为真实签名，否则将被判定为仿造签名。图~\ref{fig:roc-forgers}展示
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=0.6\textwidth]{figure/mimic-random-total-ROC-curves.pdf}
+  \includegraphics[width=0.4\textwidth]{figure/mimic-random-total-ROC-curves.pdf}
   \bicaption{三种仿造类型的ROC曲线}
       {ROC curves for the three types of forgers}
   \label{fig:roc-forgers}
@@ -1076,17 +1018,18 @@ M^{acce} -& C^{acce} \label{eq:distance-6}
 ASSV在通过改变一些内部参数的情况下被评估，这些参数包括：参考签名的数量，CNN卷积核的数量，训练集大小，DCT系数数量，声波频率数量和分类器类型。
 
 \subsection{参考签名数量}
-为了评估在签名认证时，参考签名数量对AUC和EER结果的影响，选择在参考签名数量在1到22时测试系统。对于每个选择的参考签名数量，通过重复实验(参考~\S\ref{sec:accuracy-experiment})来得到平均的AUC和EER。图~\ref{fig:rcount-auc-lines}和图~\ref{fig:rcount-eer-lines}显示
+为了评估在签名认证时，参考签名数量对AUC和EER结果的影响，选择在参考签名数量在1到22时测试系统。对于每个选择的参考签名数量，通过重复实验(参考~\S\ref{sec:accuracy-experiment})来得到平均的AUC和EER。图~\ref{fig:rcount-auc-lines}
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=0.7\textwidth]{figure/rcount-auc-lines.pdf}
+  \includegraphics[width=0.6\textwidth]{figure/rcount-auc-lines.pdf}
   \bicaption{参考标签数量影响 - AUC}
       {Reference amount effect - AUC}
   \label{fig:rcount-auc-lines}
 \end{figure}
+和图~\ref{fig:rcount-eer-lines}显示
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=0.7\textwidth]{figure/rcount-eer-lines.pdf}
+  \includegraphics[width=0.6\textwidth]{figure/rcount-eer-lines.pdf}
   \bicaption{参考标签数量影响 - EER}
       {Reference amount effect - EER}
   \label{fig:rcount-eer-lines}
@@ -1098,7 +1041,7 @@ ASSV在通过改变一些内部参数的情况下被评估，这些参数包括�
 选择20作为参考签名的数量，将CNN卷积核数目设置为8、16、32、64、128和256，在不同的卷积核数量情况下测试系统性能。图~\ref{fig:filter-number-effect}显示
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=0.7\textwidth]{figure/filter_number_auc_eer.pdf}
+  \includegraphics[width=0.5\textwidth]{figure/filter_number_auc_eer.pdf}
   \bicaption{CNN卷积核数量的影响}
       {CNN filter number effect }
   \label{fig:filter-number-effect}
@@ -1109,7 +1052,7 @@ ASSV在通过改变一些内部参数的情况下被评估，这些参数包括�
 选择20作为参考签名的数量，128作为卷积核数量。为了评估训练集大小对试验结果的影响，保持测试集的大小不变，将训练集的大小改变成100，300，...，1700。如图~\ref{fig:train-size-effect}所示，
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=0.7\textwidth]{figure/train_size_auc_eer.pdf}
+  \includegraphics[width=0.5\textwidth]{figure/train_size_auc_eer.pdf}
   \bicaption{训练集大小的影响}
       {Train set size effect }
   \label{fig:train-size-effect}
@@ -1117,28 +1060,28 @@ ASSV在通过改变一些内部参数的情况下被评估，这些参数包括�
 当训练集大小从100增加到1700时，AUC从0.814增加到0.980，EER从0.263增加到0.071。就如预期的那样，当训练集大小增加到一定程度后，AUC和EER的曲线开始收敛。
 
 \subsection{DCT系数数量}
-选择20作为参考签名的数量，为了评估DCT系数数量对实验结果的影响，将DCT系数数量设置为8、9、10、15、20、25、30、35和40。对前面的几个DCT系数数量设置间隔较小，实现较为精细的评估。在三种情况下测试DCT系数的数量的影响：第一种情况下，只有相位变化的速度信息被使用；第二种情况下，只有相位变化的加速度信息被使用；第三种情况下，相位变化的速度信息和加速度信息都被使用。假设$C$表示被设置的DCT系数数量，所以在前两种情况下，距离矩阵的形状为($C$, 8, 3)，而在第三种情况中，距离矩阵的形状为($C$, 8, 6)。图~\ref{fig:dct-total-auc}和图~\ref{fig:dct-total-eer}显示
+选择20作为参考签名的数量，为了评估DCT系数数量对实验结果的影响，将DCT系数数量设置为8、9、10、15、20、25、30、35和40。对前面的几个DCT系数数量设置间隔较小，实现较为精细的评估。在三种情况下测试DCT系数的数量的影响：第一种情况下，只有相位变化的速度信息被使用；第二种情况下，只有相位变化的加速度信息被使用；第三种情况下，相位变化的速度信息和加速度信息都被使用。假设$C$表示被设置的DCT系数数量，所以在前两种情况下，距离矩阵的形状为($C$, 8, 3)，而在第三种情况中，距离矩阵的形状为($C$, 8, 6)。图~\ref{fig:dct-total-auc}和图~\ref{fig:dct-total-eer}显示了评估结果，
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=0.8\textwidth]{figure/dct_total_auc.pdf}
+  \includegraphics[width=0.5\textwidth]{figure/dct_total_auc.pdf}
   \bicaption{DCT系数数量 - AUC}
       {DCT coefficient number - AUC}
   \label{fig:dct-total-auc}
 \end{figure}
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=0.8\textwidth]{figure/dct_total_eer.pdf}
+  \includegraphics[width=0.5\textwidth]{figure/dct_total_eer.pdf}
   \bicaption{DCT系数数量 - EER}
       {DCT coefficient number - EER}
   \label{fig:dct-total-eer}
 \end{figure}
-了评估结果，当DCT系数数量是从8到40的时候，只使用相位变化的速度信息的系统性能优于只使用加速度信息的系统，总体上相位变化的速度信息和加速度信息的结合可以提升系统性能。接着，将注意力转移到第三种情况中，如图~\ref{fig:dct-total-auc}所示，当时DCT系数数量为10时，系统的性能达到最佳，当DCT系数继续增加的时候，由于噪音的增加，系统性能开始变差。
+当DCT系数数量是从8到40的时候，只使用相位变化的速度信息的系统性能优于只使用加速度信息的系统，总体上相位变化的速度信息和加速度信息的结合可以提升系统性能。接着，将注意力转移到第三种情况中，如图~\ref{fig:dct-total-auc}所示，当时DCT系数数量为10时，系统的性能达到最佳，当DCT系数继续增加的时候，由于噪音的增加，系统性能开始变差。
 
 \subsection{声波频率数量}
 选择20作为参考签名的数量。为了评估频率数量对试验结果的影响，将频率数量设置为$FN=3, 4,..., 8$。所以，距离矩阵的形状为$(10, FN, 6)$。由于\textit{max pooling}的降维效果，当频率数量小于8的时候，两层卷积池化层将无法工作。因此，为了能够顺利训练和测试模型，在原有的CNN模型基础上减去了一层卷积池化层，使用修改后的模型。图~\ref{fig:frequency-number}报告
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=0.8\textwidth]{figure/multi_frequency_auc_eer.pdf}
+  \includegraphics[width=0.5\textwidth]{figure/multi_frequency_auc_eer.pdf}
   \bicaption{频率数量的影响}
       {Frequency number effect}
   \label{fig:frequency-number}
@@ -1238,7 +1181,7 @@ ASSV在通过改变一些内部参数的情况下被评估，这些参数包括�
 根据对基于声波的签名认证系统的需求分析，为保证原型系统具有良好的可扩展性和可维护性，本研究对原型系统采用分层架构。框架设计如图~\ref{fig:system-framework},
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=0.6\textwidth]{figure/prototype-architecture.pdf}
+  \includegraphics[width=0.5\textwidth]{figure/prototype-architecture.pdf}
   \bicaption{系统架构设计}
       {The design of system framework}
   \label{fig:system-framework}
@@ -1250,6 +1193,7 @@ ASSV在通过改变一些内部参数的情况下被评估，这些参数包括�
 数据层主要负责声波的发射和接收，由于需要与外设扬声器和麦克风通信，这部分需要调用相关的安卓系统接口。安卓版本为android 7，apk文件的最小sdk版本是21，目标和编译sdk版本都是27。
 
 在发射声波部分，需要调用扬声器相关的API，android.media.MediaPlayer类来实现对预先生成音频文件的播放来发射声波。如代码~\ref{src:create-media-player}所示，
+
 \begin{lstlisting}[language={Java}, caption={创建MediaPlayer对象 \label{src:create-media-player}}]
 mediaPlayer = MediaPlayer.create(this, R.raw.sound)   //创建MediaPlayer对象
 \end{lstlisting}
@@ -1274,7 +1218,10 @@ ConfigInfo.audioFormat,   //AudioFormat.ENCODING\_PCM\_FLOAT
 ConfigInfo.bufferSize    // 48000*2*2
 )
 \end{lstlisting}
+
+
 需要创建AudioRecord对象，它的startRecord和stop方法用于开始和停止声波数据的记录。麦克风产生的是流式数据，需要通过循环读来获取数据，如代码~\ref{src:read-data-stream}所示，将读到的数据写到一个输出流中。
+
 \begin{lstlisting}[language={Java}, caption={读取数据流 \label{src:read-data-stream}} ]
 fun writeData(outputStream: OutputStream) {
     val buffer: ByteBuffer = ByteBuffer.allocateDirect(ConfigInfo.bufferSize!! / 3) //创建Direct内存缓存区
@@ -1339,7 +1286,6 @@ public boolean offer(double value) {
 相位信息估计，利用保存在缓存区buffer里的同相分量和正交分量的数据，来估计相位相关信息。
 
 特征提取，DCT转化和使用前10个系数，返回特征矩阵，如代码~\ref{src:feature-extraction}所示。
-
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[language={Java}, caption={特征提取 \label{src:feature-extraction}}]
 private double[][] extractFeature(List<double[]> phaseRelatedInfos) {
@@ -1387,10 +1333,8 @@ private double[][] extractFeature(List<double[]> phaseRelatedInfos) {
 实现了安卓平台上的基于声波签名认证系统，该原型系统主要提供给用户身份识别功能。该系统采用分层架构，对其中的数据层、业务逻辑层和表示层的具体实现进行了详细介绍。最后从CPU使用、内存使用和系统延迟三个方面对系统运行效率进行了评估。
 
 \chapter{总结与展望}
-
 \section{工作总结}
-
-自动手写签名认证是通过现代计算机技术将手写签名真实性判别这个过程自动化，减少人力开销和人为错误。 手写签名从产生至今已经有很长的历史，被广泛应用于政府部门、银行业等领域，然而这种认证方式易于遭受仿造，减少手写签名认证错误的研究很有意义。按照数据来源划分，自动手写签名认证方式可以被分为两种：离线手写签名认证和在线手写签名认证。在线签名认证由于相比离线签名认证多出了时间维度上的信息，具有更高的准确度。先前的工作，如果要使用那些自动手写签名认证系统，需要用户使用特定的设备，或者佩戴可穿戴式设备。将无线感知技术运用到手写签名认证中，利用智能手机发射和接收声波信号感知签名者的签名行为，通过与参考签名比较来判断是否为本人签名，设计了一种非侵入式、鲁棒的、安全的、低延迟的在线手写签名方案，并按照该方案实现了一个原型系统——ASSV。本文取得的成果如下：
+自动手写签名认证是通过现代计算机技术将手写签名真实性判别这个过程自动化，减少人力开销和人为错误。 手写签名从产生至今已经有很长的历史，被广泛应用于政府部门、银行业等领域，然而这种认证方式易于遭受仿造，减少手写签名认证错误的研究很有意义。按照数据来源划分，自动手写签名认证方式可以被分为两种：离线手写签名认证和在线手写签名认证。在线签名认证由于相比离线签名认证多出了时间维度上的信息，具有更高的准确度。先前的工作，如果要使用那些自动手写签名认证系统，需要用户使用特定的设备，或者佩戴可穿戴式设备。将无线感知技术运用到手写签名认证中，利用智能手机发射和接收声波信号感知签名者的签名行为，通过与参考签名比较来判断是否为本人签名，设计了一种非侵入式、鲁棒的、安全的、低延迟的在线手写签名认证方案，并按照该方案实现了一个原型系统——ASSV。本文取得的成果如下：
 
 (1)基于声波信号的感知方法
 
@@ -1406,7 +1350,7 @@ private double[][] extractFeature(List<double[]> phaseRelatedInfos) {
 
 (4)手写签名认证的原型系统
 
-本文针对于第三章提出的基于声波签名认证方案及第四章的实验验证结果，设计并实现了基于声波的签名认证系统。首先分析系统的用户需求，接着完成系统架构的设计，最后进行一系列评估实验来评估系统的运行效率性能效果。
+利用一个三星手机和普通的个人电脑，设计并实现了基于声波的签名认证系统。首先分析系统的用户需求，接着完成系统架构的设计，最后进行一系列评估实验来评估系统的运行效率性能效果。
 
 \section{研究展望}
 本文提出的基于声波的签名认证方案具有比较好的准确度和低延迟，有很强的普适性。但仍然存在一些不足之处：在系统的测试和评估中，声音音量都固定设置为10。不同智能手机的扬声器和麦克风的硬件特性可能有所不同，而扬声器和麦克风在智能手机上的位置也会随着手机自身架构的原因有所不同。因此，如果是其他手机(不是三星Galaxy S6)，可能需要进行一些适配。

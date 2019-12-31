@@ -1,0 +1,67 @@
+%# -*- coding: utf-8-unix -*-
+% !TEX program = xelatex
+% !TEX root = ../thesis.tex
+% !TEX encoding = UTF-8 Unicode
+\chapter{算法}
+\begin{algorithm}[!htp]
+\caption{获得特征矩阵}
+\label{alg:get-feature-matrix}
+\begin{algorithmic}[1]
+\Procedure{GET\_FEATURE\_MATRIX}{$data$} \Comment{data是接收到的离散声波信号}
+\State $BaseFrequency \gets 17350, FreqNum \gets 8, dctNum \gets 10$ \Comment{初始化起始频率、频率数目和DCT系数数目}
+
+\State $VelocityFeatureVectors \gets []$  \Comment{初始化速度特征向量列表}
+\State $AcceleratinoFeatureVectors \gets []$ \Comment{初始化加速度特征向量列表}
+\State $freqIndex \gets 0$ 
+\While{$freqIndex < FreqNum$} \Comment{遍历数据点}
+\State $freq \gets BaseFrequency + freqIndex\times 700$
+\State $VelocityFeatureVector,AccelerationFeatureVector \gets  GET\_FEATURE\_VECTOR(data, freq, dctNum)$
+\State add $VelocityFeatureVector$ to list $VelocityFeatureVectors$ \Comment{添加速度特征向量到特征向量列表中}
+\State add $AccelerationFeatureVector$ to list $AcceleratinoFeatureVectors$ \Comment{添加加速度特征向量到特征向量列表中}
+\State $freqIndex \gets freqIndex + 1$
+\EndWhile\label{euclidendwhile}
+\State $VelocityFeatureMatrix \gets$ construct\_feature\_matrix\_from $VelocityFeatureVectors$ \Comment{形状为(8,10)}
+\State $AccelerationFeatureMatrix \gets$ construct\_feature\_matrix\_from $AccelerationFeatureVectors$ \Comment{形状为(8,10)}
+\State \textbf{return} $VelocityFeatureMatrix,AccelerationFeatureMatrix,$\Comment{返回结果}
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+
+\begin{algorithm}
+\caption{获得特征向量}
+\label{alg:get-feature-vector}
+\begin{algorithmic}[1]
+\Procedure{GET\_FEATURE\_VECTOR}{$data,f,dctNum$}\Comment{data是接收到的离散声波信号,f是声波频率,dctNum为dct索取系数数量}
+\State $FreqRate \gets 48000$           \Comment{采样率为48 kHz}
+\State $I \gets [], Q \gets []$  \Comment{初始化I-component和Q-component}
+\State $dataLen \gets$ getLengthof $data$  \Comment{获得data的数据点数量}
+\State $i \gets 0$
+\While{$i < dataLen$} \Comment{遍历数据点}
+\State $I[i]=data[i]*cos(\frac{2\pi fi}{FreqRate})$
+\State $Q[i]=data[i]*(-sin(\frac{2\pi fi}{FreqRate}))$
+\State $i \gets i + 1$
+\EndWhile\label{euclidendwhile}
+\State $I \gets $ DownSample $\gets $ LowPassFilter $I$   \Comment{获得I-component}
+\State $Q \gets $ DownSample $\gets $ LowPassFilter $Q$   \Comment{获得Q-component}
+\State $I\_seasonal,I\_trend,I\_resid \gets$ seasonal decompose $I$      \Comment{趋势季节分解}
+\State $Q\_seasonal,Q\_trend,Q\_resid \gets$ seasonal decompose $Q$  
+\State $j \gets 1$
+\State $\Delta Chord \gets []$
+\While{$j < getLengthOf(I\_trend)$} \Comment{遍历数据点}
+\State $\Delta Chord[j-1] \gets \sqrt{(I[j]-I[j-1])^{2} + (Q[j]-Q[j-1])^{2}}$
+\State $j \gets j + 1$
+\EndWhile\label{euclidendwhile}
+\State $k \gets 1$
+\State $Acceleration \gets []$
+\While{$k < getLengthOf(\Delta Chord)-1$} \Comment{遍历数据点}
+\State $Acceleration[k-1] \gets \frac{(\Delta Chord[k+1] - \Delta Chord[k]) + (\Delta Chord[k+1] - \Delta Chord[k])/2}{2}$
+\State $k \gets k + 1$
+\EndWhile\label{euclidendwhile}
+\State $VelocityFeatureVector \gets dct(\Delta Chord)[:dctNum]$
+\State $AccelerationFeatureVector \gets dct(Acceleration)[:dctNum]$
+\State \textbf{return} $VelocityFeatureVector,AccelerationFeatureVector$\Comment{返回结果}
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
