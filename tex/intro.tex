@@ -747,7 +747,7 @@ X_{k} = \sum_{n=0}^{N-1}x[n] \cdot e^{-j\frac{2\pi kn}{N}} \quad n=0,...,N-1.  \
 
 （1）特征矩阵
 
-假设$W$是对于每个用户的参考签名数量。考虑8个频率，则特征向量的数量为$16*W$,其中包括$8*W$速度特征向量和$8*W$个加速度特征向量。对于每个参考签名，有8个速度特征矩阵，一个由这8个速度矩阵组成的形状为(8,10)的特征矩阵可以表示为：
+假设$W$是对于每个用户的参考签名数量。考虑8个频率，则特征向量的数量为$16*W$,其中包括$8*W$速度特征向量和$8*W$个加速度特征向量。对于每个参考签名，有8个速度特征向量，一个由这8个速度向量组成的形状为(8,10)的特征矩阵可以表示为：
 \begin{equation}
   M_{i}^{vel}=\left( m^{vel}_{i,j,k}\right)_{8\times10} \quad i=1,2,..,W.
 \end{equation}
@@ -780,7 +780,7 @@ C^{acce} =& \left( c_{j,k}^{acce} \right)_{8\times 10} \label{eq:acce-feature-ma
 
 结果，每个注册用户都有一个保存在本地文件系统中的参考矩阵:
 \begin{equation}
- S_{reference}=\left\{ a_{j,k}^{vel},b_{j,k}^{vel},c_{j,k}^{vel},a_{j,k}^{acce},b_{j,k}^{acce},c_{j,k}^{acce} \right\}.
+ S_{reference}=\left\{ A_{j,k}^{vel},B_{j,k}^{vel},C_{j,k}^{vel},A_{j,k}^{acce},B_{j,k}^{acce},C_{j,k}^{acce} \right\}.
 \end{equation}
 
 （1）距离矩阵
