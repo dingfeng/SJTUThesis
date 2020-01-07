@@ -298,19 +298,19 @@ DTW是一种非常经典用于计算两个不同长度序列之间距离的算�
 \end{table}
 该型号智能手机的硬件配置如表~\ref{tab:smartphone-hardware-setting}~\footnote{https://www.gsmarena.com/samsung\_galaxy\_s6-6849.php}所示，其具有较好的计算性能和较大的内存空间，支持24-bit/192kHz的音频设备，可以满足本研究对设备的要求。
 
-\subsection{声波信号下转化}
+\subsection{声波信号下变频}
 将智能手机上麦克风的采样率设置为48 kHz，由于接收和发射声波的设备在同一智能手机共享一个时钟频率，因此接收端和发送端之间不存在载频偏移(Carrier Frequency Offset, CFO)。因此，可使用图~\ref{fig:sound-signal-down-conversion}
 \begin{figure}[!htp]
   \centering
   \includegraphics[width=0.5\textwidth]{figure/down-conversion.pdf}
   \bicaption
-    {声波信号下转化}
+    {声波信号下变频}
     {Sound signal down conversion}
   \label{fig:sound-signal-down-conversion}
 \end{figure}
-所示的相干解调器结构将接收到的声波信号下转化为基带信号~\cite{tse2005fundamentals}，接收信号被分成两份副本，分别乘以发射信号$-cos2\pi ft$和它的相位偏移信号$-sin2\pi ft$，再经过一个低通滤波器获得同相(In-phase)和正交(Quadrature)分量。
+所示的相干解调器结构将接收到的声波信号下变频为基带信号~\cite{tse2005fundamentals}，接收信号被分成两份副本，分别乘以发射信号$-cos2\pi ft$和它的相位偏移信号$-sin2\pi ft$，再经过一个低通滤波器获得同相(In-phase)和正交(Quadrature)分量。
 
-LLAP~\cite{wang2016device}中对信号下转化的过程进行了解释。为了更好地理解数字下转化过程，假设一个信号路径$p$的路径长度随时间变化的函数为$d_p\left( t\right)$。来自路径$p$的信号可以表示为:
+LLAP~\cite{wang2016device}中对信号下变频的过程进行了解释。为了更好地理解数字下变频过程，假设一个信号路径$p$的路径长度随时间变化的函数为$d_p\left( t\right)$。来自路径$p$的信号可以表示为:
 \begin{equation}
   R_{p}\left( t\right) = 2A^{'}_{p}cos \left( 2\pi ft - 2\pi fd_{p}\left( t \right) / c - \theta_{p} \right).
 \end{equation}
@@ -431,7 +431,7 @@ CNN~\cite{goodfellow2016deep}是一种用于处理网格状数据的特殊ANN，
 
 (2) 声波相位相关信息采集
 
-在收到声波反射信号之后，对声波信号进行向下转换从而获得基带信号的两个正交分量。通常在求相位之前，需要对这两个正交分量去直流，然后计算出相位信号，但是在这两个正交信号变化过于多样时，去直流变得异常困难。本文提出使用求弦长的方法，估算了相关信息(速度和加速度)。除了解决去直流问题，还需要预先对两个正交信号进行去噪。
+在收到声波反射信号之后，对声波信号进行向下变频从而获得基带信号的两个正交分量。通常在求相位之前，需要对这两个正交分量去直流，然后计算出相位信号，但是在这两个正交信号变化过于多样时，去直流变得异常困难。本文提出使用求弦长的方法，估算了相关信息(速度和加速度)。除了解决去直流问题，还需要预先对两个正交信号进行去噪。
 
 
 (3) 特征提取
@@ -566,12 +566,12 @@ Signal_{compensated}=\alpha \sum_{i=0}^{|S_{freq}|-1} \frac{1}{A_i} cos 2\pi f_{
 其中$\alpha$是幅度缩放系数以保证$\alpha \sum_{i=0}^{|S_{freq}|-1}\frac{1}{A_i}=1$。
 
 \section{基于声波的相位相关信息的感知技术研究}\label{sec:sensing-research}
-为了获得接收声波中的相位相关信息，需要先对接收信号进行下转化(signal down conversion)，然后根据获得的两个正交分量计算相位相关信息。
+为了获得接收声波中的相位相关信息，需要先对接收信号进行下变频(signal down conversion)，然后根据获得的两个正交分量计算相位相关信息。
 
-\subsection{信号下转化}
-在计算相位相关信息之前，首先需要对接收信号进行信号下转化，将信号从通带信号(passband signal)转化为基带信号(baseband signal)，这个过程在LLAP~\cite{wang2016device}中有所描述，本文重点描述与其的不同之处。
+\subsection{信号下变频}
+在计算相位相关信息之前，首先需要对接收信号进行信号下变频，将信号从通带信号(passband signal)转化为基带信号(baseband signal)，这个过程在LLAP~\cite{wang2016device}中有所描述，本文重点描述与其的不同之处。
 
-为了易于实现ASSV，本文使用巴特沃斯低通滤波器(low-pass Butterworth filter)作为所需的低通滤波器，而不是Cascaded Integrator Comb (CIC)滤波器。不失一般性，本文首先描述单一频率声波信号的信号下转化过程，如图~\ref{fig:sound-signal-down-conversion}所示。在此过程中，接收信号分两个分支进行操作：其中一个分支中，接收信号乘以$cos2\pi ft$并紧跟一个低通滤波操作，获得基带信号的同相分量(In-phase, I)；另外一个分支中，接收信号乘以$-sin2\pi ft$并紧跟一个低通滤波操作，获得基带信号的正交分量(Quadrature, Q)。对两个分支经低通滤波获得的输出进行降采样，将数据量缩小到原来的$1/300$。既然在扬声器上的声波发射频率和麦克风上的声波接收频率均为48 kHz，所以最后数据的采样率是160 Hz，这其实是计算开销和判别准确性之间的一个折衷。
+为了易于实现ASSV，本文使用巴特沃斯低通滤波器(low-pass Butterworth filter)作为所需的低通滤波器，而不是Cascaded Integrator Comb (CIC)滤波器。不失一般性，本文首先描述单一频率声波信号的信号下变频过程，如图~\ref{fig:sound-signal-down-conversion}所示。在此过程中，接收信号分两个分支进行操作：其中一个分支中，接收信号乘以$cos2\pi ft$并紧跟一个低通滤波操作，获得基带信号的同相分量(In-phase, I)；另外一个分支中，接收信号乘以$-sin2\pi ft$并紧跟一个低通滤波操作，获得基带信号的正交分量(Quadrature, Q)。对两个分支经低通滤波获得的输出进行降采样，将数据量缩小到原来的$1/300$。既然在扬声器上的声波发射频率和麦克风上的声波接收频率均为48 kHz，所以最后数据的采样率是160 Hz，这其实是计算开销和判别准确性之间的一个折衷。
 
 
 在实验的同时，有人在说话，有空调在运行，有个人电脑的散热器在转动，所以接收信号受到繁杂的环境噪声影响，如图~\ref{fig:noisy-denoised-component}所示，
@@ -610,7 +610,7 @@ c.残差序列。残差序列是一个这样的一个序列，为了满足相加
 \end{figure}
 从上到下的子图分别是原始序列、趋势序列、季节序列和残差序列。在STD的输出序列中，本文只采用趋势序列作为结果序列，如图~\ref{fig:noisy-denoised-component}所示，充满噪声的是原始序列，而相对平滑的是趋势序列，该图展现STD在本文中良好的去噪声效果。
 
-本文使用的是离线版本的STD，只有当声波信号被全部接收和下转化之后，STD才能对整个信号使用。既然该基于函数的方法使用滑动平均的方法，STD实际上可以被实现成在线版本STD2~\cite{std2},在线版本更适用于实际应用，可以减少延迟。
+本文使用的是离线版本的STD，只有当声波信号被全部接收和下变频之后，STD才能对整个信号使用。既然该基于函数的方法使用滑动平均的方法，STD实际上可以被实现成在线版本STD2~\cite{std2},在线版本更适用于实际应用，可以减少延迟。
 
 \subsection{计算相位相关信息}
 为了更好地理解估计相位相关信息的方法，首先展示2个关键发现，然后使用它们的数学原理。
@@ -1186,7 +1186,7 @@ ASSV在通过改变一些内部参数的情况下被评估，这些参数包括�
       {The design of system framework}
   \label{fig:system-framework}
 \end{figure}
-系统从下到上分为三层：最下层是数据层，主要功能是负责扬声器和麦克风相关系统接口的调用和协调，播放预先生成的音频文件发射声波，接收声波数据，上传给上层；中间层是业务逻辑层，主要负责接收到原始声波数据之后的相关处理，包括：信号下转化、相位信息估计、特征提取和分类；最上层是表示层，主要是提供一个和用户的交互UI，包括应用程序的注册界面和认证界面，用户从界面发出命令给系统，相应结果也由界面展示。整个系统分为两部分：服务端和安卓端，服务端用Python实现，运行CNN预测模型，其余部分都在安卓端实现，通过socket实现安卓端和服务端的通信。 
+系统从下到上分为三层：最下层是数据层，主要功能是负责扬声器和麦克风相关系统接口的调用和协调，播放预先生成的音频文件发射声波，接收声波数据，上传给上层；中间层是业务逻辑层，主要负责接收到原始声波数据之后的相关处理，包括：信号下变频、相位信息估计、特征提取和分类；最上层是表示层，主要是提供一个和用户的交互UI，包括应用程序的注册界面和认证界面，用户从界面发出命令给系统，相应结果也由界面展示。整个系统分为两部分：服务端和安卓端，服务端用Python实现，运行CNN预测模型，其余部分都在安卓端实现，通过socket实现安卓端和服务端的通信。 
 
 
 \subsection{数据层}
@@ -1248,10 +1248,10 @@ fun writeData(outputStream: OutputStream) {
 
 
 \subsection{业务逻辑层}
-业务逻辑层拥有一条与数据层中的输出流通过管道相连的输入流，可以处理原始的声波数据，处理步骤包括：信号下转化、相位信息估计、特征提取和分类。当用户执行注册操作的时候，不需要分类步骤。安卓端业务逻辑部分使用Java实现，打包成Jar包，引入到安卓项目中；服务端的分类器使用Python实现；两者间，将数据使用Json序列化后，利用Socket进行TCP通信。
+业务逻辑层拥有一条与数据层中的输出流通过管道相连的输入流，可以处理原始的声波数据，处理步骤包括：信号下变频、相位信息估计、特征提取和分类。当用户执行注册操作的时候，不需要分类步骤。安卓端业务逻辑部分使用Java实现，打包成Jar包，引入到安卓项目中；服务端的分类器使用Python实现；两者间，将数据使用Json序列化后，利用Socket进行TCP通信。
 
-信号下转化，采用在线处理的方式，每获得一个数据点，就针对这个点进行信号下转化。低通滤波器采用在线Butterworth滤波器，可以实现一个一个数据点处理。运行过程如代码~\ref{src:signal-down-conversion}所示，
-\begin{lstlisting}[language={Java}, caption={实时信号下转化 \label{src:signal-down-conversion}} ]
+信号下变频，采用在线处理的方式，每获得一个数据点，就针对这个点进行信号下变频。低通滤波器采用在线Butterworth滤波器，可以实现一个一个数据点处理。运行过程如代码~\ref{src:signal-down-conversion}所示，
+\begin{lstlisting}[language={Java}, caption={实时信号下变频 \label{src:signal-down-conversion}} ]
 public boolean offer(double value) {
       if (this.size == BUFFER_SIZE) {
           return false;
